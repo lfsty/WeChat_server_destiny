@@ -18,7 +18,7 @@ with open("./data/main_data.json", "r") as f:
         db_port = data["database"]["db_port"]
     except:
         print("destiny_api.json文件读取出错")
-        exit
+        os._exit(0)
 
 # 读取帮助信息
 try:

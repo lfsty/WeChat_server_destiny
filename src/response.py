@@ -1,5 +1,6 @@
 from src.MY_CONST import *
 import src.destiny_api
+import src.database
 import xmltodict
 import time
 import json
@@ -69,21 +70,21 @@ async def TextHandler(wechat_id, content_list):
                     resp_content += "\n-------------\n"
                     resp_content += item
                 resp_content += "\n-------------"
-    #     # 参数为raid，查看raid记录
-    #     elif content_list[0] == "raid":
-    #         data = FindUserDataByWchatID(wechat_id)
-    #         if data != None:
-    #             SteamID = data[1]
-    #             MembershipID = data[2]
-    #             UserName = data[3]
-    #             RaidReport = await destiny.getUserRaidReportByMemberShipID(
-    #                 MembershipID, UserName)
-    #             if RaidReport != "error":
-    #                 resp_content = RaidReport
-    #             else:
-    #                 resp_content = "查询出错，请稍后再试"
-    #         else:
-    #             resp_content = "尚未绑定账号"
+        # 参数为raid，查看raid记录
+        elif content_list[0] == "raid":
+            data = await src.database.FindUserDataByWchatID(wechat_id)
+            if data != None:
+                SteamID = data[1]
+                MembershipID = data[2]
+                UserName = data[3]
+                RaidReport = await src.destiny_api.getUserRaidReportByMemberShipID(
+                    MembershipID, UserName)
+                if RaidReport != None:
+                    resp_content = RaidReport
+                else:
+                    resp_content = "查询出错，请稍后再试"
+            else:
+                resp_content = "尚未绑定账号"
     #     # 参数为elo，查看elo记录
     #     elif content_list[0] == "elo":
     #         data = FindUserDataByWchatID(wechat_id)
@@ -100,19 +101,23 @@ async def TextHandler(wechat_id, content_list):
     #     else:
     #         resp_content = help
     # # 有两个参数
-    # elif len(content_list) == 2:
-    #     # 指令为绑定
-    #     if content_list[0] == "绑定":
-    #         if destiny.is_steamid64(content_list[1]):
-    #             SteamID = content_list[1]
-    #             MembershipID = await destiny.getMembershipIDBySteamID(SteamID)
-    #             UserName = await destiny.getUsernameByMenbershipid(MembershipID)
-    #             if save_data(wechat_id, SteamID, MembershipID, UserName):
-    #                 resp_content = "绑定账号成功"
-    #             else:
-    #                 resp_content = "绑定账号失败"
-    #         else:
-    #             resp_content = "请输入正确的Steamid"
+    elif len(content_list) == 2:
+        # 指令为绑定
+        if content_list[0] == "绑定":
+            if src.destiny_api.is_steamid64(content_list[1]):
+                SteamID = content_list[1]
+                MembershipID = await src.destiny_api.getMembershipIDBySteamID(SteamID)
+                if MembershipID == None:
+                    return "error"
+                UserName = await src.destiny_api.getUsernameByMenbershipid(MembershipID)
+                if UserName == None:
+                    return "error"
+                if await src.database.save_data(wechat_id, SteamID, MembershipID, UserName):
+                    resp_content = "绑定账号成功"
+                else:
+                    resp_content = "绑定账号失败"
+            else:
+                resp_content = "请输入正确的Steamid"
     #     # 指令为elo
     #     elif content_list[0] == "elo":
     #         if destiny.is_steamid64(content_list[1]):

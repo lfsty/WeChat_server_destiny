@@ -11,6 +11,7 @@ async def conn_db():
 
 
 async def save_data(wechatid, steamid, membershipid, username):
+
     conn = await conn_db()
     cursor = await conn.cursor()
 
@@ -33,3 +34,21 @@ async def save_data(wechatid, steamid, membershipid, username):
         await cursor.close()
         conn.close()
         return False
+
+
+async def FindUserDataByWchatID(wechatid):
+
+    conn = await conn_db()
+    cursor = await conn.cursor()
+
+    sql = """SELECT * FROM UserData WHERE wechatid='%s'""" \
+        % (wechatid)
+
+    try:
+        await cursor.execute(sql)
+        data = await cursor.fetchone()
+        await cursor.close()
+        conn.close()
+    except:
+        return None
+    return data
