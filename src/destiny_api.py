@@ -7,6 +7,7 @@ import re
 from collections import Counter
 import urllib3
 
+
 def is_steamid64(input_text):
     """判断是否为steamid
     返回：True/False
@@ -166,7 +167,8 @@ async def getUserRaidReportByMemberShipID(destinyMembershipId, UserName, members
     except:
         return "查询出错，请稍后再试"
 
-async def getPlayerdataBySteamID(steamid,UserName, season="13"):
+
+async def getPlayerdataBySteamID(steamid, UserName, season="13"):
     url = f"https://api.tracker.gg/api/v2/destiny-2/standard/profile/steam/{steamid}/segments/playlist?season={season}"
     try:
         response = await urllibRequestGet(url)
@@ -198,12 +200,14 @@ async def getPlayerdataBySteamID(steamid,UserName, season="13"):
         # all_data+=tmp
     return UserName + "\n" + all_data + "--------------"
 
+
 async def getPartyMembersDataByMembershipID(destinyMembershipId, membershipType="3"):
-    url = ROOT + f"/Destiny2/{membershipType}/Profile/{destinyMembershipId}/?components=1000"
+    url = ROOT + \
+        f"/Destiny2/{membershipType}/Profile/{destinyMembershipId}/?components=1000"
     resp = await GetResponseByUrl(url, need_header=True)
     resp = json.loads(resp)["Response"]
     if "data" in resp["profileTransitoryData"]:
-        #在线
+        # 在线
         partyMembers_data = resp["profileTransitoryData"]["data"]["partyMembers"]
         partyMembers = []
         for item in partyMembers_data:
@@ -213,18 +217,20 @@ async def getPartyMembersDataByMembershipID(destinyMembershipId, membershipType=
             partyMembers.append(tmp)
         return partyMembers
     else:
-        #不在线
+        # 不在线
         return None
+
 
 async def getPartyMembersRaidReport(destinyMembershipId, membershipType="3"):
     partyMembers = await getPartyMembersDataByMembershipID(destinyMembershipId)
     if partyMembers == None:
         return "玩家不在线"
     else:
-        resp_data =""
-        task_list=[]
+        resp_data = ""
+        task_list = []
         for item in partyMembers:
-            task_tmp = asyncio.create_task(getUserRaidReportByMemberShipID(item["membershipId"],item["displayName"],membershipType))
+            task_tmp = asyncio.create_task(getUserRaidReportByMemberShipID(
+                item["membershipId"], item["displayName"], membershipType))
             task_list.append(task_tmp)
         for task_item in task_list:
             resp_data += "\n"
@@ -237,10 +243,11 @@ async def getPartyMembersElo(destinyMembershipId, membershipType="3"):
     if partyMembers == None:
         return "玩家不在线"
     else:
-        resp_data =""
-        task_list=[]
+        resp_data = ""
+        task_list = []
         for item in partyMembers:
-            task_tmp = asyncio.create_task(getPlayerdataBySteamID(item["membershipId"],item["displayName"]))
+            task_tmp = asyncio.create_task(getPlayerdataBySteamID(
+                item["membershipId"], item["displayName"]))
             task_list.append(task_tmp)
         for task_item in task_list:
             if resp_data != "":

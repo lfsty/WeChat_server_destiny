@@ -2,6 +2,7 @@ Manifest/
 test.py
 main_data.json
 access_token.json
+images/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

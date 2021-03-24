@@ -36,6 +36,32 @@ async def save_data(wechatid, steamid, membershipid, username):
         return False
 
 
+async def save_data_daily(name, media_id, created_time):
+
+    conn = await conn_db()
+    cursor = await conn.cursor()
+
+    sql = """INSERT INTO daily
+        (daily_name,media_id,created_time)
+            VALUES ('%s','%s','%d')
+            ON DUPLICATE KEY UPDATE media_id='%s',created_time='%d'""" \
+        % (name, media_id, created_time, media_id, created_time)
+    try:
+        await cursor.execute(sql)
+        await conn.commit()
+
+        await cursor.close()
+        conn.close()
+
+        return True
+    except:
+        # 发生错误时回滚
+        await conn.rollback()
+        await cursor.close()
+        conn.close()
+        return False
+
+
 async def FindUserDataByWchatID(wechatid):
 
     conn = await conn_db()
@@ -43,6 +69,24 @@ async def FindUserDataByWchatID(wechatid):
 
     sql = """SELECT * FROM UserData WHERE wechatid='%s'""" \
         % (wechatid)
+
+    try:
+        await cursor.execute(sql)
+        data = await cursor.fetchone()
+        await cursor.close()
+        conn.close()
+    except:
+        return None
+    return data
+
+
+async def FindDailyByName(name):
+
+    conn = await conn_db()
+    cursor = await conn.cursor()
+
+    sql = """SELECT * FROM daily WHERE daily_name='%s'""" \
+        % (name)
 
     try:
         await cursor.execute(sql)

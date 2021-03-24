@@ -7,44 +7,11 @@ import json
 import asyncio
 import src.accessToken
 import src.urlRequest
+import src.imgHandler
+
 
 def thread_response(xml_data):
     asyncio.run(response(xml_data))
-
-async def sendDataToUser(msgtype,touser,content):
-    resp_data = {
-        "touser":touser,
-        "msgtype":msgtype,
-        "text":
-        {
-            "content":content
-        }
-    }
-    access_token = await src.accessToken.getAccessToken()
-    url = f"https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={access_token}"
-    await src.urlRequest.PostResponse(url,resp_data)    
-
-
-async def response(xml_data):
-    dict_data = xmltodict.parse(xml_data)['xml']  # 进行XML解析
-    msg_type = dict_data['MsgType']
-    wechat_id = dict_data['FromUserName']
-    await sendDataToUser("text",dict_data['FromUserName'],"收到消息，处理中...")
-    # 判断内容是否为文字
-    if msg_type == "text":
-        msg_id = dict_data['MsgId']
-        content_list = dict_data['Content'].split(" ")
-        resp_content = await TextHandler(wechat_id, content_list)
-    # 消息类型为关注或取关
-    elif msg_type == "event":
-        if dict_data['Event'] == "subscribe":
-            resp_content = help
-        else:
-            return None
-    else:
-        resp_content = "请输入文本"
-
-    await sendDataToUser("text",dict_data['FromUserName'],resp_content)
 
 
 def get_Season(season_input):
@@ -60,15 +27,67 @@ def get_Season(season_input):
     return season
 
 
+async def sendDataToUser(msgtype, touser, content):
+    resp_data = {}
+    if msgtype == "text":
+        resp_data = {
+            "touser": touser,
+            "msgtype": "text",
+            "text":
+            {
+                "content": content
+            }
+        }
+    elif msgtype == "image":
+        resp_data = {
+            "touser": touser,
+            "msgtype": "image",
+            "image":
+            {
+                "media_id": content
+            }
+        }
+    if resp_data != {}:
+        access_token = await src.accessToken.getAccessToken()
+        url = f"https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={access_token}"
+        await src.urlRequest.PostResponse(url, resp_data)
+
+
+async def response(xml_data):
+    dict_data = xmltodict.parse(xml_data)['xml']  # 进行XML解析
+    msg_type = dict_data['MsgType']
+    wechat_id = dict_data['FromUserName']
+    await sendDataToUser("text", dict_data['FromUserName'], "收到消息，处理中...")
+    # 判断内容是否为文字
+    if msg_type == "text":
+        msg_id = dict_data['MsgId']
+        content_list = dict_data['Content'].split(" ")
+        resp_content, msgtype = await TextHandler(wechat_id, content_list)
+    # 消息类型为关注或取关
+    elif msg_type == "event":
+        if dict_data['Event'] == "subscribe":
+            msgtype = "text"
+            resp_content = help
+        else:
+            return None
+    else:
+        msgtype = "text"
+        resp_content = "请输入文本"
+
+    await sendDataToUser(msgtype, dict_data['FromUserName'], resp_content)
+
+
 async def TextHandler(wechat_id, content_list):
     print(content_list)
     # 只有一个参数
     if len(content_list) == 1:
         # 参数为help，提供help
         if content_list[0] == "help":
+            msgtype = "text"
             resp_content = help
         # 参数为老九，查询xur位置
         elif content_list[0] in xur:
+            msgtype = "text"
             xur_location = await src.destiny_api.getXurLocation()
             if xur_location != "老九还没来":
                 xur_saleitems = await src.destiny_api.getXurSaleItems()
@@ -79,6 +98,7 @@ async def TextHandler(wechat_id, content_list):
                 resp_content += "\n-------------"
         # 参数为raid，查看raid记录
         elif content_list[0] == "raid":
+            msgtype = "text"
             data = await src.database.FindUserDataByWchatID(wechat_id)
             if data != None:
                 SteamID = data[1]
@@ -90,6 +110,7 @@ async def TextHandler(wechat_id, content_list):
                 resp_content = "尚未绑定账号"
         # 参数为elo，查看elo记录
         elif content_list[0] == "elo":
+            msgtype = "text"
             data = await src.database.FindUserDataByWchatID(wechat_id)
             if data != None:
                 SteamID = data[1]
@@ -98,14 +119,23 @@ async def TextHandler(wechat_id, content_list):
                 resp_content = await src.destiny_api.getPlayerdataBySteamID(SteamID, UserName)
             else:
                 resp_content = "尚未绑定账号"
+        elif content_list[0] == "日报":
+            msgtype = "image"
+            resp_content = await src.imgHandler.getDaily()
+            if resp_content == None:
+                resp_content = "获取日报出错"
+                msgtype = "text"
         elif content_list[0] == "涩图":
+            msgtype = "text"
             resp_content = "呵呵..."
         else:
+            msgtype = "text"
             resp_content = help
     # # 有两个参数
     elif len(content_list) == 2:
         # 指令为绑定
         if content_list[0] == "绑定":
+            msgtype = "text"
             if src.destiny_api.is_steamid64(content_list[1]):
                 SteamID = content_list[1]
                 MembershipID = await src.destiny_api.getMembershipIDBySteamID(SteamID)
@@ -122,6 +152,7 @@ async def TextHandler(wechat_id, content_list):
                 resp_content = "请输入正确的Steamid"
         # 指令为elo
         elif content_list[0] == "elo":
+            msgtype = "text"
             if src.destiny_api.is_steamid64(content_list[1]):
                 SteamID = content_list[1]
                 MembershipID = await src.destiny_api.getMembershipIDBySteamID(SteamID)
@@ -131,6 +162,7 @@ async def TextHandler(wechat_id, content_list):
                 resp_content = "请输入正确的Steamid"
         # 指令为raid
         elif content_list[0] == "raid":
+            msgtype = "text"
             if src.destiny_api.is_steamid64(content_list[1]):
                 SteamID = content_list[1]
                 MembershipID = await src.destiny_api.getMembershipIDBySteamID(SteamID)
@@ -140,6 +172,7 @@ async def TextHandler(wechat_id, content_list):
                 resp_content = "请输入正确的Steamid"
         # 指令为队友
         elif content_list[0] == "队友":
+            msgtype = "text"
             if content_list[1] == "raid":
                 data = await src.database.FindUserDataByWchatID(wechat_id)
                 if data != None:
@@ -159,10 +192,12 @@ async def TextHandler(wechat_id, content_list):
                 else:
                     resp_content = "尚未绑定账号"
         else:
+            msgtype = "text"
             resp_content = help
     # 有三个参数
     elif len(content_list) == 3:
         if content_list[0] == "elo" and content_list[1] == "赛季":
+            msgtype = "text"
             season = get_Season(content_list[2])
             if season == "error":
                 resp_content = "赛季输入出错"
@@ -176,9 +211,11 @@ async def TextHandler(wechat_id, content_list):
                 else:
                     resp_content = "尚未绑定账号"
         else:
+            msgtype = "text"
             resp_content = help
     elif len(content_list) == 4:
         if content_list[0] == "elo" and content_list[2] == "赛季":
+            msgtype = "text"
             if src.destiny_api.is_steamid64(content_list[1]):
                 season = get_Season(content_list[3])
                 if season == "error":
@@ -191,9 +228,11 @@ async def TextHandler(wechat_id, content_list):
             else:
                 resp_content = "SteamID出错"
         else:
+            msgtype = "text"
             resp_content = help
     # 五个及以上参数
     else:
+        msgtype = "text"
         resp_content = help
 
-    return resp_content
+    return resp_content, msgtype

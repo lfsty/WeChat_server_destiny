@@ -60,6 +60,13 @@ try:
             membershipid char(19),
             username char(30))"""
     cursor.execute(sql)
+
+    sql = """CREATE TABLE IF NOT EXISTS daily ( 
+            daily_name char(15) NOT NULL PRIMARY KEY,
+            media_id char(70),
+            created_time int(10))"""
+    cursor.execute(sql)
+
     cursor.close()
     db.close()
 except:
@@ -67,7 +74,5 @@ except:
     os._exit(0)
 
 if not os.path.exists("./data/access_token.json"):
-    with open("./data/access_token.json","w+") as f:
+    with open("./data/access_token.json", "w+") as f:
         f.write("{}")
-
-
