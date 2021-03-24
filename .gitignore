@@ -1,7 +1,7 @@
 Manifest/
 test.py
-data/main_data.json
-
+main_data.json
+access_token.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

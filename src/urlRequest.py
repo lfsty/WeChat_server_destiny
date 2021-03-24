@@ -3,7 +3,7 @@ import asyncio
 import os
 import json
 from src.MY_CONST import *
-
+import urllib3
 
 async def GetResponseByUrl(url, need_header=False):
     if need_header:
@@ -21,3 +21,11 @@ async def GetResponseByUrl(url, need_header=False):
 
     response = requests.get(url, proxies=proxies, headers=headers)
     return response.text
+
+async def PostResponse(url, payload):
+    response = requests.post(url, data=bytes(json.dumps(payload, ensure_ascii=False), encoding='utf-8'))
+    return response.text
+
+async def urllibRequestGet(url):
+    response = urllib3.PoolManager().request('GET', url).data.decode()
+    return response

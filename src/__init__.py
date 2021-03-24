@@ -65,3 +65,9 @@ try:
 except:
     print("初始化数据库出错")
     os._exit(0)
+
+if not os.path.exists("./data/access_token.json"):
+    with open("./data/access_token.json","w+") as f:
+        f.write("{}")
+
+

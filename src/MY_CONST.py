@@ -16,6 +16,8 @@ with open("./data/main_data.json", "r") as f:
         db_username = data["database"]["db_username"]
         db_passwd = data["database"]["db_passwd"]
         db_port = data["database"]["db_port"]
+        wechat_appID = data["wechat"]["appID"]
+        appsecret = data["wechat"]["appsecret"]
     except:
         print("destiny_api.json文件读取出错")
         os._exit(0)
@@ -45,3 +47,4 @@ with open("./Manifest/DestinyInventoryItemDefinition.json", "r") as f:
 
 with open("./Manifest/DestinyActivityDefinition.json", "r") as f:
     ActivityDefinition = json.load(f)
+
