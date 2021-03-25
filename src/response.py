@@ -263,7 +263,7 @@ async def getElo(wechat_id=None, steamid=None, party=False, season="13"):
                 SteamID = data[1]
                 MembershipID = data[2]
                 UserName = data[3]
-                resp_content = await src.destiny_api.getPartyMembersRaidReport(MembershipID)
+                resp_content = await src.destiny_api.getPartyMembersElo(MembershipID)
             else:
                 resp_content = "尚未绑定账号"
         else:
