@@ -7,7 +7,7 @@ python微信公众号后台服务器，命运2相关信息查询。
 鸣谢 @seanalpha @天阙 @wenmumu @kamuxiy 。
 
 ## 使用
-* 根据./data/main_data_template.json填入相关内容，proxy可填可不填
+* 根据./data/main_data_template.json填入相关内容，proxy可填可不填,改完后改名为main_data.json
 
 * update_interface.py用于更新微信公众号自定义接口，具体配置在./src/interface.py中
 
@@ -20,3 +20,4 @@ python微信公众号后台服务器，命运2相关信息查询。
   ~~~
 
   注：本代码在python3.7.5测试通过
+
