@@ -1,5 +1,4 @@
 import os
-import src.DownloadManifest
 import asyncio
 import pymysql
 import json
@@ -11,11 +10,6 @@ if not os.path.exists("./data/main_data.json"):
 if not os.path.exists("./data/destiny_data.json"):
     print("destiny_data.json文件不存在...")
     os._exit(0)
-
-if not os.path.exists("./Manifest"):
-    print("Manifest文件不存在，下载Manifest")
-    if asyncio.run(src.DownloadManifest.getManifest()) == None:
-        os._exit(0)
 
 
 with open("./data/main_data.json", "r") as f:
@@ -109,3 +103,12 @@ if not os.path.exists("./images/Osiris"):
 
 if not os.path.exists("./images/xur"):
     os.makedirs("./images/xur")
+
+if not os.path.exists("./log"):
+    os.makedirs("./log")
+
+if not os.path.exists("./Manifest"):
+    import src.DownloadManifest
+    print("Manifest文件不存在，下载Manifest")
+    if asyncio.run(src.DownloadManifest.getManifest()) == None:
+        os._exit(0)

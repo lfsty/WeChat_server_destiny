@@ -1,0 +1,23 @@
+{
+    "destiny_api": {
+        "api_key": "",
+        "client_id": "",
+        "root": "https://www.bungie.net/Platform"
+    },
+    "proxy": "",
+    "database": {
+        "db_host": "",
+        "db_username": "",
+        "db_passwd": "",
+        "db_port": 3306
+    },
+    "server": {
+        "path": "/",
+        "port": 80,
+        "TOKEN": ""
+    },
+    "wechat": {
+        "appID": "",
+        "appsecret": ""
+    }
+}

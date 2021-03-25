@@ -4,6 +4,7 @@ main_data.json
 access_token.json
 images/
 calculate_lines.py
+log/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
