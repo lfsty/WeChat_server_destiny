@@ -31,13 +31,14 @@ try:
 except:
     help = "help error"
 
-
+choose_list = ["weekly", "daily", "Osiris", "xur"]
 xur = ["老九", "老玖", "xur"]
 with open("./data/destiny_data.json", "r") as f:
     main_data = json.load(f)
     season_list = main_data["season"]
     current_season = main_data["current_season"]
     xur_location = main_data["xur_location"]
+    entry_name = main_data["entry_name"]
 
 remain = {"Control": "占领", "Iron Banner": "铁骑",
           "Survival": "生存", "Trials of Osiris": "试炼"}
@@ -47,4 +48,3 @@ with open("./Manifest/DestinyInventoryItemDefinition.json", "r") as f:
 
 with open("./Manifest/DestinyActivityDefinition.json", "r") as f:
     ActivityDefinition = json.load(f)
-

@@ -36,8 +36,7 @@ async def save_data(wechatid, steamid, membershipid, username):
         return False
 
 
-async def save_data_daily_weekly(name, media_id, created_time, choose):
-    choose_list = ["weekly", "daily"]
+async def save_data_image(name, media_id, created_time, choose):
     if choose not in choose_list:
         print("choose出错")
         return False
@@ -83,9 +82,7 @@ async def FindUserDataByWchatID(wechatid):
     return data
 
 
-async def FindDailyWeeklyByName(name, choose):
-
-    choose_list = ["weekly", "daily"]
+async def FindImageByName(name, choose):
     if choose not in choose_list:
         print("choose出错")
         return False

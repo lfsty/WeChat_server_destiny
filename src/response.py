@@ -102,6 +102,9 @@ async def TextHandler(wechat_id, content_list):
         # 参数为elo，查看周报
         elif content_list[0] == "周报":
             resp_content, msgtype = await getWeekly()
+        # 参数为试炼，查看试炼情报
+        elif content_list[0] == "试炼":
+            resp_content, msgtype = await getOsiris()
         # 其他
         else:
             resp_content, msgtype = await elseData()
@@ -164,20 +167,22 @@ async def EventKeyHandler(wechat_id, EventKey):
         resp_content, msgtype = await getRaid(wechat_id=wechat_id)
     elif EventKey == "help":
         resp_content, msgtype = await elseData()
+    elif EventKey == "Osiris":
+        resp_content, msgtype = await getOsiris()
     return resp_content, msgtype
 
 
-async def getXur():
-    msgtype = "text"
-    xur_location = await src.destiny_api.getXurLocation()
-    if xur_location != "老九还没来":
-        xur_saleitems = await src.destiny_api.getXurSaleItems()
-        resp_content = f"位置：{xur_location}"
-        for item in xur_saleitems:
-            resp_content += "\n-------------\n"
-            resp_content += item
-        resp_content += "\n-------------"
-    return resp_content, msgtype
+# async def getXur():
+#     msgtype = "text"
+#     xur_location = await src.destiny_api.getXurLocation()
+#     if xur_location != "老九还没来":
+#         xur_saleitems = await src.destiny_api.getXurSaleItems()
+#         resp_content = f"位置：{xur_location}"
+#         for item in xur_saleitems:
+#             resp_content += "\n-------------\n"
+#             resp_content += item
+#         resp_content += "\n-------------"
+#     return resp_content, msgtype
 
 
 async def getRaid(wechat_id=None, steamid=None, party=False):
@@ -282,6 +287,24 @@ async def getWeekly():
     resp_content = await src.imgHandler.getWeekly()
     if resp_content == None:
         resp_content = "获取周报出错"
+        msgtype = "text"
+    return resp_content, msgtype
+
+
+async def getXur():
+    msgtype = "image"
+    resp_content = await src.imgHandler.getXurOrOsiris("xur")
+    if resp_content == None:
+        resp_content = "获取XUR情报出错或时间错误"
+        msgtype = "text"
+    return resp_content, msgtype
+
+
+async def getOsiris():
+    msgtype = "image"
+    resp_content = await src.imgHandler.getXurOrOsiris("Osiris")
+    if resp_content == None:
+        resp_content = "获取试炼情报出错或时间错误"
         msgtype = "text"
     return resp_content, msgtype
 

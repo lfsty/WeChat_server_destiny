@@ -73,6 +73,18 @@ try:
             created_time int(10))"""
     cursor.execute(sql)
 
+    sql = """CREATE TABLE IF NOT EXISTS Osiris ( 
+            name char(15) NOT NULL PRIMARY KEY,
+            media_id char(70),
+            created_time int(10))"""
+    cursor.execute(sql)
+
+    sql = """CREATE TABLE IF NOT EXISTS xur ( 
+            name char(15) NOT NULL PRIMARY KEY,
+            media_id char(70),
+            created_time int(10))"""
+    cursor.execute(sql)
+
     cursor.close()
     db.close()
 except:
@@ -91,3 +103,9 @@ if not os.path.exists("./images/daily"):
 
 if not os.path.exists("./images/weekly"):
     os.makedirs("./images/weekly")
+
+if not os.path.exists("./images/Osiris"):
+    os.makedirs("./images/Osiris")
+
+if not os.path.exists("./images/xur"):
+    os.makedirs("./images/xur")

@@ -27,6 +27,11 @@ async def createMenu():
                         "type": "click",
                         "name": "XUR",
                         "key": "xur"
+                    },
+                    {
+                        "type": "click",
+                        "name": "试炼情报",
+                        "key": "Osiris"
                     }]
             },
             {
