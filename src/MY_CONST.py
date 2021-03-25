@@ -1,5 +1,5 @@
 import json
-
+import logging
 api_key = ""
 ROOT = ""
 proxy = ""
@@ -48,3 +48,17 @@ with open("./Manifest/DestinyInventoryItemDefinition.json", "r") as f:
 
 with open("./Manifest/DestinyActivityDefinition.json", "r") as f:
     ActivityDefinition = json.load(f)
+
+
+access = logging.getLogger("access")
+# 定制logger的输出格式
+formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+# 创建日志：文件日志，终端日志
+file_handler = logging.FileHandler('./log/access.log')
+file_handler.setFormatter(formatter)
+consle_handler = logging.StreamHandler()
+consle_handler.setFormatter(formatter)
+# 设置默认的日志级别,上线后推荐设置为Info,而不是Debug
+access.setLevel(logging.INFO)
+# 把文件日志和终端日志添加到日志处理器中
+access.addHandler(file_handler)

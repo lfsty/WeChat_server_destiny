@@ -80,7 +80,7 @@ async def response(xml_data):
 
 
 async def TextHandler(wechat_id, content_list):
-    print(content_list)
+    access.info(f"{wechat_id}:{content_list}")
     # 只有一个参数
     if len(content_list) == 1:
         # 参数为help，提供help
@@ -150,7 +150,7 @@ async def returnWaitingMsg(wechat_id):
 
 
 async def EventKeyHandler(wechat_id, EventKey):
-    print(wechat_id, EventKey)
+    access.info(f"{wechat_id}:{EventKey}")
     if EventKey == "daily":
         resp_content, msgtype = await getDaily()
     elif EventKey == "weekly":
@@ -187,6 +187,7 @@ async def EventKeyHandler(wechat_id, EventKey):
 
 async def getRaid(wechat_id=None, steamid=None, party=False):
     msgtype = "text"
+    await returnWaitingMsg(wechat_id)
     if not party:
         # 查询单人
         if steamid == None:
@@ -209,7 +210,6 @@ async def getRaid(wechat_id=None, steamid=None, party=False):
             else:
                 resp_content = "请输入正确的Steamid"
     else:
-        await returnWaitingMsg(wechat_id)
         # 查询火力战队
         if steamid == None:
             # 查询自身火力战队
@@ -234,6 +234,7 @@ async def getElo(wechat_id=None, steamid=None, party=False, season="13"):
         season = get_Season(season)
         if season == "error":
             return "赛季输入出错", msgtype
+    await returnWaitingMsg(wechat_id)
     if not party:
         # 查询单人
         if steamid == None:
@@ -256,7 +257,6 @@ async def getElo(wechat_id=None, steamid=None, party=False, season="13"):
             else:
                 resp_content = "请输入正确的Steamid"
     else:
-        await returnWaitingMsg(wechat_id)
         if steamid == None:
             data = await src.database.FindUserDataByWchatID(wechat_id)
             if data != None:
