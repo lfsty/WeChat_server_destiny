@@ -57,7 +57,6 @@ async def response(xml_data):
     dict_data = xmltodict.parse(xml_data)['xml']  # 进行XML解析
     msg_type = dict_data['MsgType']
     wechat_id = dict_data['FromUserName']
-    await sendDataToUser("text", dict_data['FromUserName'], "收到消息，处理中...")
     # 判断内容是否为文字
     if msg_type == "text":
         msg_id = dict_data['MsgId']
@@ -124,6 +123,12 @@ async def TextHandler(wechat_id, content_list):
             resp_content = await src.imgHandler.getDaily()
             if resp_content == None:
                 resp_content = "获取日报出错"
+                msgtype = "text"
+        elif content_list[0] == "周报":
+            msgtype = "image"
+            resp_content = await src.imgHandler.getWeekly()
+            if resp_content == None:
+                resp_content = "获取周报出错"
                 msgtype = "text"
         elif content_list[0] == "涩图":
             msgtype = "text"

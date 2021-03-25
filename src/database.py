@@ -36,16 +36,19 @@ async def save_data(wechatid, steamid, membershipid, username):
         return False
 
 
-async def save_data_daily(name, media_id, created_time):
-
+async def save_data_daily_weekly(name, media_id, created_time, choose):
+    choose_list = ["weekly", "daily"]
+    if choose not in choose_list:
+        print("choose出错")
+        return False
     conn = await conn_db()
     cursor = await conn.cursor()
 
-    sql = """INSERT INTO daily
-        (daily_name,media_id,created_time)
+    sql = """INSERT INTO %s
+        (name,media_id,created_time)
             VALUES ('%s','%s','%d')
             ON DUPLICATE KEY UPDATE media_id='%s',created_time='%d'""" \
-        % (name, media_id, created_time, media_id, created_time)
+        % (choose, name, media_id, created_time, media_id, created_time)
     try:
         await cursor.execute(sql)
         await conn.commit()
@@ -80,14 +83,18 @@ async def FindUserDataByWchatID(wechatid):
     return data
 
 
-async def FindDailyByName(name):
+async def FindDailyWeeklyByName(name, choose):
+
+    choose_list = ["weekly", "daily"]
+    if choose not in choose_list:
+        print("choose出错")
+        return False
 
     conn = await conn_db()
     cursor = await conn.cursor()
 
-    sql = """SELECT * FROM daily WHERE daily_name='%s'""" \
-        % (name)
-
+    sql = """SELECT * FROM %s WHERE name='%s'""" \
+        % (choose, name)
     try:
         await cursor.execute(sql)
         data = await cursor.fetchone()

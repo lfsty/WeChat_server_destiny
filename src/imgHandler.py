@@ -1,38 +1,78 @@
 from src.MY_CONST import *
 import src.database
 import asyncio
-import requests
+import src.urlRequest
 import json
-import time
 import src.accessToken
 import os
+from bs4 import BeautifulSoup
+import datetime
+import requests
 
 
 async def getDaily():
-    name = time.strftime("%Y-%m-%d", time.localtime())
+    choose = "daily"
+    name = datetime.datetime.now().strftime("%Y-%m-%d")
     files = os.listdir("./images/daily/")
     full_path = f"./images/daily/{name}.png"
     try:
         if f"{name}.png" in files:
             # 本地已存在日报文件
-            data = await src.database.FindDailyByName(name)
+            data = await src.database.FindDailyWeeklyByName(name, choose="daily")
             if data != None:
                 return data[1]
             else:
-                resp = await uploadImageToWeChat(full_path)
-                media_id = resp["media_id"]
-                created_time = resp["created_at"]
-                await src.database.save_data_daily(name, media_id, created_time)
-                return media_id
+                return await bindAction(full_path, choose, name)
         else:
             await downloadDaily()
-            resp = await uploadImageToWeChat(full_path)
-            media_id = resp["media_id"]
-            created_time = resp["created_at"]
-            await src.database.save_data_daily(name, media_id, created_time)
-            return media_id
+            return await bindAction(full_path, choose, name)
     except:
         return None
+
+
+async def getWeekly():
+    choose = "weekly"
+    today = datetime.datetime.now().weekday()
+    if today >= 2:
+        gap = today - 2
+    else:
+        gap = today + 4
+    name = (datetime.datetime.now()-datetime.timedelta(days=gap)
+            ).strftime("%Y-%m-%d")
+    files = os.listdir("./images/weekly/")
+    full_path = f"./images/weekly/{name}.jpg"
+    try:
+        if f"{name}.jpg" in files:
+            # 本地已存在周报
+            data = await src.database.FindDailyWeeklyByName(name, choose="weekly")
+            if data != None:
+                now_time = datetime.datetime.timestamp(datetime.datetime.now())
+                media_id = data[1]
+                created_time = data[2]
+                if now_time - float(created_time) < 259200.0:
+                    return media_id
+                else:
+                    return await bindAction(full_path, choose, name)
+            else:
+                return await bindAction(full_path, choose, name)
+        else:
+            await downloadWeekly()
+            return await bindAction(full_path, choose, name)
+    except:
+        return None
+
+
+async def bindAction(full_path, choose, name):
+    choose_list = ["weekly", "daily"]
+    if choose not in choose_list:
+        print("choose出错")
+        return False
+
+    resp = await uploadImageToWeChat(full_path)
+    media_id = resp["media_id"]
+    created_time = resp["created_at"]
+    await src.database.save_data_daily_weekly(name, media_id, created_time, choose)
+    return media_id
 
 
 async def uploadImageToWeChat(filepath):
@@ -46,9 +86,30 @@ async def uploadImageToWeChat(filepath):
 
 async def downloadDaily():
     url = "http://www.tianque.top/d2api/today/"
-    data = json.loads(requests.get(url).text)
+    resp = await src.urlRequest.GetResponseByUrl(url)
+    data = json.loads(resp)
     img_name = data["img_name"]
     img_url = data["img_url"]
     with open(f'./images/daily/{img_name}', 'wb') as f:
-        resp = requests.get(img_url)
-        f.write(resp.content)
+        resp = await src.urlRequest.GetResponseByUrl(img_url, content=True)
+        f.write(resp)
+
+
+async def downloadWeekly():
+    url = "https://api.xiaoheihe.cn/wiki/get_homepage_content/?wiki_id=1085660&verison=&is_share=1"
+    resp = await src.urlRequest.GetResponseByUrl(url)
+    data = json.loads(resp)
+    lists = data["result"]["chunk"][0]["block"][0]["tag_list"][1]["block_entries"]
+    for item in lists:
+        if item["entry_name"] == "命运2周报":
+            entry_url = item["entry_url"]
+            name = item["id"].split(" - ")[1]
+            name = datetime.datetime.strptime(
+                name, '%Y.%m.%d').strftime("%Y-%m-%d")
+            break
+    resp = await src.urlRequest.GetResponseByUrl(entry_url)
+    soup = BeautifulSoup(resp, 'html.parser')
+    img_url = soup.find(class_="lazy").get("data-original")
+    with open(f'./images/weekly/{name}.jpg', 'wb') as f:
+        resp = await src.urlRequest.GetResponseByUrl(img_url, content=True)
+        f.write(resp)

@@ -62,7 +62,13 @@ try:
     cursor.execute(sql)
 
     sql = """CREATE TABLE IF NOT EXISTS daily ( 
-            daily_name char(15) NOT NULL PRIMARY KEY,
+            name char(15) NOT NULL PRIMARY KEY,
+            media_id char(70),
+            created_time int(10))"""
+    cursor.execute(sql)
+
+    sql = """CREATE TABLE IF NOT EXISTS weekly ( 
+            name char(15) NOT NULL PRIMARY KEY,
             media_id char(70),
             created_time int(10))"""
     cursor.execute(sql)
@@ -76,3 +82,12 @@ except:
 if not os.path.exists("./data/access_token.json"):
     with open("./data/access_token.json", "w+") as f:
         f.write("{}")
+
+if not os.path.exists("./images"):
+    os.makedirs("./images")
+
+if not os.path.exists("./images/daily"):
+    os.makedirs("./images/daily")
+
+if not os.path.exists("./images/weekly"):
+    os.makedirs("./images/weekly")

@@ -5,7 +5,8 @@ import json
 from src.MY_CONST import *
 import urllib3
 
-async def GetResponseByUrl(url, need_header=False):
+
+async def GetResponseByUrl(url, need_header=False, content=False):
     if need_header:
         headers = {
             "X-API-Key": api_key,
@@ -19,12 +20,18 @@ async def GetResponseByUrl(url, need_header=False):
     else:
         proxies = None
 
-    response = requests.get(url, proxies=proxies, headers=headers)
-    return response.text
+    if content:
+        response = requests.get(url, proxies=proxies, headers=headers).content
+    else:
+        response = requests.get(url, proxies=proxies, headers=headers).text
+    return response
+
 
 async def PostResponse(url, payload):
-    response = requests.post(url, data=bytes(json.dumps(payload, ensure_ascii=False), encoding='utf-8'))
+    response = requests.post(url, data=bytes(json.dumps(
+        payload, ensure_ascii=False), encoding='utf-8'))
     return response.text
+
 
 async def urllibRequestGet(url):
     response = urllib3.PoolManager().request('GET', url).data.decode()

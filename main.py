@@ -36,11 +36,8 @@ class MainHandler(tornado.web.RequestHandler):
 
     async def post(self):
         xml_data = self.request.body  # 获得post来的数据
-        # resp = await src.response.response(xml_data)
-        # if resp != None:
-        #     self.write(resp)
-        # else:
-        threading.Thread(target = src.response.thread_response,args =(xml_data,)).start()
+        threading.Thread(target=src.response.thread_response,
+                         args=(xml_data,)).start()
         self.write("success")
 
 
