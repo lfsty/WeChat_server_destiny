@@ -92,17 +92,17 @@ async def getMembershipIDBySteamID(steamid):
         return None
 
 
-async def getSteamIDByMembership(membershipid):
+async def getSteamIDByMembershipID(membershipid):
     try:
         url = f"https://www.bungie.net/en/Profile/{membershipid}"
-        data = GetResponseByUrl(url)
+        data = await GetResponseByUrl(url)
         soup = BeautifulSoup(data, 'html.parser')
         result = soup.find(
             class_='inner-text-content').find(class_='title').get_text()
         steamid_pattern = re.compile(r"7656[0-9]{13}")
         return steamid_pattern.search(result).group(0)
     except:
-        print("getSteamIDByMembership出错")
+        print("getSteamIDByMembershipID出错")
         return None
 
 
@@ -233,7 +233,8 @@ async def getPartyMembersRaidReport(destinyMembershipId, membershipType="3"):
                 item["membershipId"], item["displayName"], membershipType))
             task_list.append(task_tmp)
         for task_item in task_list:
-            resp_data += "\n"
+            if resp_data != "":
+                resp_data += "\n"
             resp_data += await task_item
         return resp_data
 
@@ -254,3 +255,18 @@ async def getPartyMembersElo(destinyMembershipId, membershipType="3"):
                 resp_data += "\n"
             resp_data += await task_item
         return resp_data
+
+
+async def SearchUsersByName(name, membershipType="-1"):
+    url = ROOT + \
+        f"/Destiny2/SearchDestinyPlayer/{membershipType}/{name}/"
+    try:
+        resp = await GetResponseByUrl(url, need_header=True)
+        data = json.loads(resp)["Response"]
+        if len(data) > 1:
+            return None
+        else:
+            return data[0]["membershipId"]
+    except:
+        print("数据获取出错")
+        return None

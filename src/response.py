@@ -213,7 +213,12 @@ async def getRaid(wechat_id=None, steamid=None, party=False):
                 UserName = await src.destiny_api.getUsernameByMenbershipid(MembershipID)
                 resp_content = await src.destiny_api.getUserRaidReportByMemberShipID(MembershipID, UserName)
             else:
-                resp_content = "请输入正确的Steamid"
+                UserName = steamid
+                MembershipID = await src.destiny_api.SearchUsersByName(UserName)
+                if MembershipID != None:
+                    resp_content = await src.destiny_api.getUserRaidReportByMemberShipID(MembershipID, UserName)
+                else:
+                    resp_content = "用户不存在或存在重名"
     else:
         # 查询火力战队
         if steamid == None:
@@ -228,7 +233,7 @@ async def getRaid(wechat_id=None, steamid=None, party=False):
                 resp_content = "尚未绑定账号"
         else:
             # steamid火力战队
-            resp_content = "error"
+            resp_content = "该服务尚未开通"
             pass
     return resp_content, msgtype
 
@@ -260,7 +265,13 @@ async def getElo(wechat_id=None, steamid=None, party=False, season="13"):
                 UserName = await src.destiny_api.getUsernameByMenbershipid(MembershipID)
                 resp_content = await src.destiny_api.getPlayerdataBySteamID(SteamID, UserName, season)
             else:
-                resp_content = "请输入正确的Steamid"
+                UserName = steamid
+                MembershipID = await src.destiny_api.SearchUsersByName(UserName)
+                if MembershipID != None:
+                    SteamID = await src.destiny_api.getSteamIDByMembershipID(MembershipID)
+                    resp_content = await src.destiny_api.getPlayerdataBySteamID(SteamID, UserName, season)
+                else:
+                    resp_content = "用户不存在或存在重名"
     else:
         if steamid == None:
             data = await src.database.FindUserDataByWchatID(wechat_id)
@@ -273,7 +284,7 @@ async def getElo(wechat_id=None, steamid=None, party=False, season="13"):
                 resp_content = "尚未绑定账号"
         else:
             # steamid火力战队
-            resp_content = "error"
+            resp_content = "该服务尚未开通"
             pass
     return resp_content, msgtype
 
