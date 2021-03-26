@@ -4,7 +4,7 @@
 
 python微信公众号后台服务器，命运2相关信息查询。
 
-鸣谢 @seanalpha @天阙 @wenmumu @kamuxiy 。
+鸣谢 @seanalpha @天阙 @wenmumu @kamuxiy @两仪未央。
 
 ## 使用
 * 根据./data/main_data_template.json填入相关内容，proxy可填可不填,改完后改名为main_data.json
