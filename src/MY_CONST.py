@@ -33,14 +33,13 @@ except:
     help = "help error"
 
 choose_list = ["weekly", "daily", "Osiris", "xur", "permanent"]
-xur = ["老九", "老玖", "xur"]
 with open("./data/destiny_data.json", "r") as f:
     main_data = json.load(f)
     season_list = main_data["season"]
     current_season = main_data["current_season"]
     xur_location = main_data["xur_location"]
     entry_name = main_data["entry_name"]
-    permanent_image_name = main_data["permanent"]
+    Options = main_data["options"]
 
 remain = {"Control": "占领", "Iron Banner": "铁骑",
           "Survival": "生存", "Trials of Osiris": "试炼"}

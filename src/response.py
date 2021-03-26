@@ -88,25 +88,25 @@ async def TextHandler(wechat_id, content_list):
             msgtype = "text"
             resp_content = help
         # 参数为老九，查询xur位置
-        elif content_list[0] in xur:
+        elif content_list[0] in Options["xur_option"]:
             resp_content, msgtype = await getXur()
         # 参数为raid，查看raid记录
-        elif content_list[0] == "raid":
+        elif content_list[0] in Options["raid_option"]:
             resp_content, msgtype = await getRaid(wechat_id=wechat_id)
         # 参数为elo，查看elo记录
-        elif content_list[0] == "elo":
+        elif content_list[0] in Options["elo_option"]:
             resp_content, msgtype = await getElo(wechat_id=wechat_id)
         # 参数为elo，查看日报
-        elif content_list[0] == "日报":
+        elif content_list[0] in Options["daily_option"]:
             resp_content, msgtype = await getDaily()
         # 参数为elo，查看周报
-        elif content_list[0] == "周报":
+        elif content_list[0] in Options["weekly_option"]:
             resp_content, msgtype = await getWeekly()
         # 参数为试炼，查看试炼情报
-        elif content_list[0] == "试炼":
+        elif content_list[0] in Options["Osiris_option"]:
             resp_content, msgtype = await getOsiris()
         # 永久图片
-        elif content_list[0] in permanent_image_name:
+        elif content_list[0] in Options["permanent_image_option"]:
             resp_content, msgtype = await getImages(content_list[0])
         # 其他
         else:
@@ -117,27 +117,27 @@ async def TextHandler(wechat_id, content_list):
         if content_list[0] == "绑定":
             resp_content, msgtype = await bindData(steamid=content_list[1], wechat_id=wechat_id)
         # 指令为elo
-        elif content_list[0] == "elo":
+        elif content_list[0] in Options["elo_option"]:
             resp_content, msgtype = await getElo(steamid=content_list[1])
         # 指令为raid
-        elif content_list[0] == "raid":
+        elif content_list[0] in Options["raid_option"]:
             resp_content, msgtype = await getRaid(steamid=content_list[1])
         # 指令为队友
         elif content_list[0] == "队友":
-            if content_list[1] == "raid":
+            if content_list[1] in Options["raid_option"]:
                 resp_content, msgtype = await getRaid(party=True, wechat_id=wechat_id)
-            elif content_list[1] == "elo":
+            elif content_list[1] in Options["elo_option"]:
                 resp_content, msgtype = await getElo(party=True, wechat_id=wechat_id)
         else:
             resp_content, msgtype = await elseData()
     # 有三个参数
     elif len(content_list) == 3:
-        if content_list[0] == "elo" and content_list[1] == "赛季":
+        if content_list[0] in Options["elo_option"] and content_list[1] == "赛季":
             resp_content, msgtype = await getElo(wechat_id=wechat_id, season=content_list[2])
         else:
             resp_content, msgtype = await elseData()
     elif len(content_list) == 4:
-        if content_list[0] == "elo" and content_list[2] == "赛季":
+        if content_list[0] in Options["elo_option"] and content_list[2] == "赛季":
             resp_content, msgtype = await getElo(steamid=content_list[1], season=content_list[3])
         else:
             resp_content, msgtype = await elseData()
@@ -172,7 +172,7 @@ async def EventKeyHandler(wechat_id, EventKey):
         resp_content, msgtype = await elseData()
     elif EventKey == "Osiris":
         resp_content, msgtype = await getOsiris()
-    elif EventKey in permanent_image_name:
+    elif EventKey in Options["permanent_image_option"]:
         resp_content, msgtype = await getImages(EventKey)
     return resp_content, msgtype
 
@@ -291,7 +291,7 @@ async def getElo(wechat_id=None, steamid=None, party=False, season="13"):
 
 async def getImages(name):
     msgtype = "image"
-    name_en = permanent_image_name[name]
+    name_en = Options["permanent_image_option"][name]
     return_data = await src.database.FindImageByName(name_en, "permanent")
     if return_data == None:
         resp_content = f"获取{name}出错"

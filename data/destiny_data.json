@@ -19,10 +19,41 @@
         "xur": "苏尔情报",
         "Osiris": "试炼周报"
     },
-    "permanent": {
-        "地窖开车关": "Deep_Stone",
-        "下水道": "Sewer",
-        "破碎王座地图": "Throne_Dungeon",
-        "许愿墙": "Wishes"
+    "options": {
+        "elo_option": [
+            "elo",
+            "ELO",
+            "Elo"
+        ],
+        "raid_option": [
+            "raid",
+            "Raid",
+            "RAID"
+        ],
+        "xur_option": [
+            "老九",
+            "老玖",
+            "xur",
+            "Xur",
+            "XUR"
+        ],
+        "daily_option": [
+            "日报",
+            "daily"
+        ],
+        "weekly_option": [
+            "周报",
+            "weekly"
+        ],
+        "Osiris_option": [
+            "试炼",
+            "Osiris"
+        ],
+        "permanent_image_option": {
+            "地窖开车关": "Deep_Stone",
+            "下水道": "Sewer",
+            "破碎王座地图": "Throne_Dungeon",
+            "许愿墙": "Wishes"
+        }
     }
 }
