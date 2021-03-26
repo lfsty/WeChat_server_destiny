@@ -105,6 +105,9 @@ async def TextHandler(wechat_id, content_list):
         # 参数为试炼，查看试炼情报
         elif content_list[0] == "试炼":
             resp_content, msgtype = await getOsiris()
+        # 永久图片
+        elif content_list[0] in permanent_image_name:
+            resp_content, msgtype = await getImages(content_list[0])
         # 其他
         else:
             resp_content, msgtype = await elseData()
@@ -169,6 +172,8 @@ async def EventKeyHandler(wechat_id, EventKey):
         resp_content, msgtype = await elseData()
     elif EventKey == "Osiris":
         resp_content, msgtype = await getOsiris()
+    elif EventKey in permanent_image_name:
+        resp_content, msgtype = await getImages(EventKey)
     return resp_content, msgtype
 
 
@@ -270,6 +275,18 @@ async def getElo(wechat_id=None, steamid=None, party=False, season="13"):
             # steamid火力战队
             resp_content = "error"
             pass
+    return resp_content, msgtype
+
+
+async def getImages(name):
+    msgtype = "image"
+    name_en = permanent_image_name[name]
+    return_data = await src.database.FindImageByName(name_en, "permanent")
+    if return_data == None:
+        resp_content = f"获取{name}出错"
+        msgtype = "text"
+    else:
+        resp_content = return_data[1]
     return resp_content, msgtype
 
 

@@ -79,6 +79,11 @@ try:
             created_time int(10))"""
     cursor.execute(sql)
 
+    sql = """CREATE TABLE IF NOT EXISTS permanent ( 
+            name char(20) NOT NULL PRIMARY KEY,
+            media_id char(70))"""
+    cursor.execute(sql)
+
     cursor.close()
     db.close()
 except:

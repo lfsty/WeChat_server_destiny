@@ -100,3 +100,45 @@ async def FindImageByName(name, choose):
     except:
         return None
     return data
+
+
+async def save_permanent_data(name, media_id):
+
+    conn = await conn_db()
+    cursor = await conn.cursor()
+
+    sql = """INSERT INTO permanent
+        (name,media_id)
+            VALUES ('%s','%s')
+            ON DUPLICATE KEY UPDATE media_id='%s'""" \
+        % (name, media_id, media_id)
+    try:
+        await cursor.execute(sql)
+        await conn.commit()
+
+        await cursor.close()
+        conn.close()
+
+        return True
+    except:
+        # 发生错误时回滚
+        await conn.rollback()
+        await cursor.close()
+        conn.close()
+        return False
+
+
+async def FindSavedPermanent():
+
+    conn = await conn_db()
+    cursor = await conn.cursor()
+
+    sql = """SELECT * FROM permanent"""
+    try:
+        await cursor.execute(sql)
+        data = await cursor.fetchall()
+        await cursor.close()
+        conn.close()
+    except:
+        return None
+    return data

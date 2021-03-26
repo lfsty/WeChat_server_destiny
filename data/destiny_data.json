@@ -18,5 +18,11 @@
     "entry_name": {
         "xur": "苏尔情报",
         "Osiris": "试炼周报"
+    },
+    "permanent": {
+        "地窖开车关": "Deep_Stone",
+        "下水道": "Sewer",
+        "破碎王座地图": "Throne_Dungeon",
+        "许愿墙": "Wishes"
     }
 }

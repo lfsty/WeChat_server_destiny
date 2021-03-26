@@ -1,0 +1,84 @@
+{
+    "button": [
+        {
+            "name": "周/日报等",
+            "sub_button": [
+                {
+                    "type": "click",
+                    "name": "日报",
+                    "key": "daily"
+                },
+                {
+                    "type": "click",
+                    "name": "周报",
+                    "key": "weekly"
+                },
+                {
+                    "type": "click",
+                    "name": "XUR",
+                    "key": "xur"
+                },
+                {
+                    "type": "click",
+                    "name": "试炼情报",
+                    "key": "Osiris"
+                }
+            ]
+        },
+        {
+            "name": "游戏帮助",
+            "sub_button": [
+                {
+                    "type": "click",
+                    "name": "地窖开车关地图",
+                    "key": "地窖开车关"
+                },
+                {
+                    "type": "click",
+                    "name": "破碎王座地图",
+                    "key": "破碎王座地图"
+                },
+                {
+                    "type": "click",
+                    "name": "利维坦下水道地图",
+                    "key": "下水道"
+                },
+                {
+                    "type": "click",
+                    "name": "许愿墙标志",
+                    "key": "许愿墙"
+                }
+            ]
+        },
+        {
+            "name": "战绩查询",
+            "sub_button": [
+                {
+                    "type": "click",
+                    "name": "帮助",
+                    "key": "help"
+                },
+                {
+                    "type": "click",
+                    "name": "我的elo",
+                    "key": "meelo"
+                },
+                {
+                    "type": "click",
+                    "name": "我的RaidReport",
+                    "key": "meraid"
+                },
+                {
+                    "type": "click",
+                    "name": "队友的elo",
+                    "key": "partyelo"
+                },
+                {
+                    "type": "click",
+                    "name": "队友的RaidReport",
+                    "key": "partyraid"
+                }
+            ]
+        }
+    ]
+}

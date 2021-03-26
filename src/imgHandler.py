@@ -160,3 +160,30 @@ async def downloadImage(name, full_path):
     with open(full_path, 'wb') as f:
         resp = await src.urlRequest.GetResponseByUrl(img_url, content=True)
         f.write(resp)
+
+
+async def uploadPermanentImageToWeChat(filepath):
+    access_token = await src.accessToken.getAccessToken()
+    img_upload_url = f"https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={access_token}&type=image"
+    with open(filepath, "rb") as f:
+        files = {"media": f}
+        resp = json.loads(requests.post(img_upload_url, files=files).text)
+    return resp
+
+
+async def updataPermanentImages():
+    path = "./images/permanent/"
+    files = os.listdir(path)
+    saved_data = []
+    items = await src.database.FindSavedPermanent()
+    for item in items:
+        saved_data.append(item[0])
+    for item in files:
+        file_path = path+item
+        name = item[:-4]
+        if name in saved_data:
+            continue
+        else:
+            resp = await src.imgHandler.uploadPermanentImageToWeChat(file_path)
+            media_id = resp["media_id"]
+            await src.database.save_permanent_data(name, media_id)
