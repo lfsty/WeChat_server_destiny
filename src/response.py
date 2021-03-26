@@ -358,5 +358,14 @@ async def bindData(steamid, wechat_id):
         else:
             resp_content = "绑定账号失败"
     else:
-        resp_content = "请输入正确的Steamid"
+        UserName = steamid
+        MembershipID = await src.destiny_api.SearchUsersByName(UserName)
+        if MembershipID != None:
+            SteamID = await src.destiny_api.getSteamIDByMembershipID(MembershipID)
+            if await src.database.save_data(wechat_id, SteamID, MembershipID, UserName):
+                resp_content = f"绑定账号成功,请确认SteamID是否正确,SteamID：{SteamID}"
+            else:
+                resp_content = "绑定账号失败"
+        else:
+            resp_content = "用户不存在或存在重名，请使用SteamID绑定"
     return resp_content, msgtype

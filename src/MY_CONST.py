@@ -35,11 +35,15 @@ except:
 choose_list = ["weekly", "daily", "Osiris", "xur", "permanent"]
 with open("./data/destiny_data.json", "r") as f:
     main_data = json.load(f)
-    season_list = main_data["season"]
-    current_season = main_data["current_season"]
-    xur_location = main_data["xur_location"]
-    entry_name = main_data["entry_name"]
-    Options = main_data["options"]
+    try:
+        season_list = main_data["season"]
+        current_season = main_data["current_season"]
+        xur_location = main_data["xur_location"]
+        entry_name = main_data["entry_name"]
+        Options = main_data["options"]
+    except:
+        print("destiny_data.json文件读取出错")
+        os._exit(0)
 
 remain = {"Control": "占领", "Iron Banner": "铁骑",
           "Survival": "生存", "Trials of Osiris": "试炼"}
