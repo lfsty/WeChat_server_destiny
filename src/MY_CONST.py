@@ -73,3 +73,15 @@ with open("./data/destiny_data.json", "r") as f:
 # ELO保留的信息
 remain = {"Control": "占领", "Iron Banner": "铁骑",
           "Survival": "生存", "Trials of Osiris": "试炼"}
+
+try:
+    # 读取Bungie的Manifest文件
+    with open("./Manifest/DestinyInventoryItemDefinition.json", "r") as f:
+        ItemDefinition = json.load(f)
+
+    with open("./Manifest/DestinyActivityDefinition.json", "r") as f:
+        ActivityDefinition = json.load(f)
+
+except:
+    ACCESS.debug("Manifest文件读取出错,请先运行update_Manifest")
+    os._exit(0)
