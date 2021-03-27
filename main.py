@@ -8,6 +8,8 @@ import os
 import src.response
 import threading
 import src.interface
+import atexit
+from src.MY_CONST import *
 TOKEN = ""
 
 
@@ -51,9 +53,14 @@ def LoadServerData():
             path = ServerData["server"]["path"]
             TOKEN = ServerData["server"]["TOKEN"]
         except:
-            print("服务器配置读取失败")
+            ACCESS.debug("服务器配置读取失败")
             exit
     return port, path
+
+
+@atexit.register
+def exit_fun():
+    ACCESS.debug("服务器退出")
 
 
 if __name__ == "__main__":
@@ -64,6 +71,8 @@ if __name__ == "__main__":
     ])
     application.listen(port)
 
-    print("服务器启动成功...")
+    print("服务器启动成功")
+    # 不知道为什么DEBUG没有输出到console
+    ACCESS.debug("服务器启动成功")
 
     tornado.ioloop.IOLoop.instance().start()

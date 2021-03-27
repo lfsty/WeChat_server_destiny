@@ -23,6 +23,7 @@ def get_Season(season_input):
                 raise Exception("Invalid season!")
             season = str(int(season_input))
         except:
+            ACCESS.debug("get_Season出错")
             season = "error"
     return season
 
@@ -80,7 +81,7 @@ async def response(xml_data):
 
 
 async def TextHandler(wechat_id, content_list):
-    access.info(f"{wechat_id}:{content_list}")
+    ACCESS.info(f"{wechat_id}:{content_list}")
     # 只有一个参数
     if len(content_list) == 1:
         # 参数为help，提供help
@@ -153,7 +154,7 @@ async def returnWaitingMsg(wechat_id):
 
 
 async def EventKeyHandler(wechat_id, EventKey):
-    access.info(f"{wechat_id}:{EventKey}")
+    ACCESS.info(f"{wechat_id}:{EventKey}")
     if EventKey == "daily":
         resp_content, msgtype = await getDaily()
     elif EventKey == "weekly":
@@ -323,7 +324,7 @@ async def getXur():
     msgtype = "image"
     resp_content = await src.imgHandler.getXurOrOsiris("xur")
     if resp_content == None:
-        resp_content = "获取XUR情报出错或时间错误"
+        resp_content = "获取XUR情报出错或尚未更新"
         msgtype = "text"
     return resp_content, msgtype
 
@@ -332,7 +333,7 @@ async def getOsiris():
     msgtype = "image"
     resp_content = await src.imgHandler.getXurOrOsiris("Osiris")
     if resp_content == None:
-        resp_content = "获取试炼情报出错或时间错误"
+        resp_content = "获取试炼情报出错或尚未更新"
         msgtype = "text"
     return resp_content, msgtype
 

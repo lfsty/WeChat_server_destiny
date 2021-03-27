@@ -27,6 +27,7 @@ async def getDaily():
             await downloadDaily()
             return await bindAction(full_path, choose, name)
     except:
+        ACCESS.debug("获取日报出错")
         return None
 
 
@@ -59,16 +60,17 @@ async def getWeekly():
             try:
                 await downloadImage("命运2周报", full_path)
             except:
-                print("下载周报失败")
+                ACCESS.debug("下载周报失败")
                 return None
             return await bindAction(full_path, choose, name)
     except:
+        ACCESS.debug("获取周报失败")
         return None
 
 
 async def getXurOrOsiris(select):
     if select not in ["xur", "Osiris"]:
-        print("select出错")
+        ACCESS.debug("getXurOrOsiris,选择出错")
         return None
     choose = select
     today = datetime.datetime.now().weekday()
@@ -99,12 +101,15 @@ async def getXurOrOsiris(select):
                     return await bindAction(full_path, choose, name)
             else:
                 try:
-                    await downloadImage(entry_name[select], full_path)
+                    res = await downloadImage(entry_name[select], full_path, name)
+                    if res == None:
+                        return None
                 except:
-                    print(f"下载{entry_name[select]}失败")
+                    ACCESS.debug(f"下载{entry_name[select]}失败")
                     return None
                 return await bindAction(full_path, choose, name)
         except:
+            ACCESS.debug(f"获取{entry_name[select]}失败")
             return None
     else:
         return None
@@ -112,7 +117,7 @@ async def getXurOrOsiris(select):
 
 async def bindAction(full_path, choose, name):
     if choose not in choose_list:
-        print("choose出错")
+        ACCESS.debug("bindAction,选择出错")
         return False
 
     resp = await uploadImageToWeChat(full_path)
@@ -142,7 +147,7 @@ async def downloadDaily():
         f.write(resp)
 
 
-async def downloadImage(name, full_path):
+async def downloadImage(name, full_path, current_time_name=None):
     url = "https://api.xiaoheihe.cn/wiki/get_homepage_content/?wiki_id=1085660&verison=&is_share=1"
     resp = await src.urlRequest.GetResponseByUrl(url)
     data = json.loads(resp)
@@ -154,6 +159,9 @@ async def downloadImage(name, full_path):
             name_date = datetime.datetime.strptime(
                 name_date, '%Y.%m.%d').strftime("%Y-%m-%d")
             break
+    if name_date != current_time_name:
+        ACCESS.debug(f"{name}，尚未更新")
+        return None
     resp = await src.urlRequest.GetResponseByUrl(entry_url)
     soup = BeautifulSoup(resp, 'html.parser')
     img_url = soup.find(class_="lazy").get("data-original")
@@ -175,7 +183,7 @@ async def updataPermanentImages():
     path = "./images/permanent/"
     files = os.listdir(path)
     saved_data = []
-    items = await src.database.FindSavedPermanent()
+    items = await src.database.FindSavedPermanent_all()
     for item in items:
         saved_data.append(item[0])
     for item in files:

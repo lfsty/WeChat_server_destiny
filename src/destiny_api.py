@@ -40,6 +40,7 @@ async def getXurLocation():
         location_name_en = re.compile(r"\s").sub(
             '', soup.find(class_="location_name").get_text())
     except:
+        ACCESS.debug("云获取XUR位置出错")
         return "位置获取出错"
     if location_name_en == "XURHASDISSAPEARED":
         return "老九还没来"
@@ -48,6 +49,7 @@ async def getXurLocation():
             location = xur_location[location_name_en.lower()]
             return location
         except:
+            ACCESS.debug("XUR位置转换出错")
             return "位置获取出错"
 
 
@@ -76,7 +78,7 @@ async def getCharacterIdsByMembershipId(destinyMembershipId, membershipType="3")
             characterIds.append(item["characterId"])
         return characterIds
     except:
-        print("getCharacterIdsByMembershipId出错")
+        ACCESS.debug("getCharacterIdsByMembershipId出错")
         return None
 
 
@@ -88,7 +90,7 @@ async def getMembershipIDBySteamID(steamid):
         resp = json.loads(resp)["Response"]
         return resp['membershipId']
     except:
-        print("getMembershipIDBySteamID出错")
+        ACCESS.debug("getMembershipIDBySteamID出错")
         return None
 
 
@@ -102,7 +104,7 @@ async def getSteamIDByMembershipID(membershipid):
         steamid_pattern = re.compile(r"7656[0-9]{13}")
         return steamid_pattern.search(result).group(0)
     except:
-        print("getSteamIDByMembershipID出错")
+        ACCESS.debug("getSteamIDByMembershipID出错")
         return None
 
 
@@ -113,7 +115,7 @@ async def getUsernameByMenbershipid(menbershipid):
         resp = json.loads(resp)["Response"]
         return resp['destinyMemberships'][0]['LastSeenDisplayName']
     except:
-        print("getUsernameByMenbershipid出错")
+        ACCESS.debug("getUsernameByMenbershipid出错")
         return None
 
 
@@ -123,7 +125,7 @@ async def getUserRaidReportByCharacterID(characterID, destinyMembershipId, membe
     try:
         resp = await GetResponseByUrl(url, need_header=True)
     except:
-        print("获取用户信息失败")
+        ACCESS.debug("获取角色CharacterID出错")
         return None
     resp = json.loads(resp)["Response"]
     raid_data = {}
@@ -138,7 +140,7 @@ async def getUserRaidReportByCharacterID(characterID, destinyMembershipId, membe
                     else:
                         raid_data[name] = 1
         except:
-            print("读取用户信息失败")
+            ACCESS.debug("CharacterID，读取用户信息出错")
             return None
         return raid_data
     else:
@@ -165,6 +167,7 @@ async def getUserRaidReportByMemberShipID(destinyMembershipId, UserName, members
         resp_data += "------------------"
         return UserName + "\nRaid通关次数：\n"+resp_data
     except:
+        ACCESS.debug(f"查询{UserName},{destinyMembershipId}Raid信息出错")
         return "查询出错，请稍后再试"
 
 
@@ -174,6 +177,7 @@ async def getPlayerdataBySteamID(steamid, UserName, season="13"):
         response = await urllibRequestGet(url)
         data = json.loads(response)['data']
     except:
+        ACCESS.debug(f"查询{UserName}，{steamid}ELO信息出错")
         return "elo数据获取出错"
     all_data = f"第{season}赛季:\n"
     for item in data:
@@ -268,5 +272,5 @@ async def SearchUsersByName(name, membershipType="-1"):
         else:
             return data[0]["membershipId"]
     except:
-        print("数据获取出错")
+        ACCESS.debug(f"{name}，查询用户membershipID出错")
         return None

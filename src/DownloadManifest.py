@@ -11,7 +11,7 @@ async def getManifest(lang="zh-chs"):
         response = await GetResponseByUrl(url, need_header=True)
         response = json.loads(response)
     except:
-        print("获取Manifest出错")
+        ACCESS.debug("获取Manifest出错")
         return None
 
     if not os.path.exists("./Manifest"):
@@ -22,7 +22,7 @@ async def getManifest(lang="zh-chs"):
 
     if lang in response['Response']["jsonWorldComponentContentPaths"]:
         jsons = response['Response']["jsonWorldComponentContentPaths"][lang]
-        print("下载Manifest中...")
+        ACCESS.debug("下载Manifest")
         pbar_total = tqdm(total=len(jsons), desc="下载进度...")
         for item in jsons:
             url = "https://www.bungie.net/"+jsons[item]
@@ -33,5 +33,5 @@ async def getManifest(lang="zh-chs"):
             pbar_total.update(1)
         pbar_total.close()
     else:
-        print("语言选择出错")
+        ACCESS.debug("Manifest语言选择出错")
         return None
