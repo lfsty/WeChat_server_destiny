@@ -22,7 +22,7 @@ async def conn_db():
         return None
 
 
-async def save_data(wechatid, steamid, membershipid, username):
+async def save_data(wechatid, steamid, membershipid, username, Authority="guest"):
     """
     保存用户绑定数据
 
@@ -40,10 +40,10 @@ async def save_data(wechatid, steamid, membershipid, username):
     cursor = await conn.cursor()
 
     sql = """INSERT INTO UserData
-        (wechatid,steamid,membershipid,username)
-            VALUES ('%s','%s','%s','%s')
-            ON DUPLICATE KEY UPDATE steamid='%s',membershipid='%s',username='%s'""" \
-        % (wechatid, steamid, membershipid, username, steamid, membershipid, username)
+        (wechatid,steamid,membershipid,username,Authority)
+            VALUES ('%s','%s','%s','%s','%s')
+            ON DUPLICATE KEY UPDATE steamid='%s',membershipid='%s',username='%s',Authority='%s'""" \
+        % (wechatid, steamid, membershipid, username, Authority, steamid, membershipid, username, Authority)
     try:
         await cursor.execute(sql)
         await conn.commit()

@@ -85,3 +85,19 @@ async def getAccessToken():
             except:
                 ACCESS.debug("access_token文件写入失败")
                 return None
+
+
+async def refresh_access_token():
+    """
+    强制刷新access_token
+    """
+    access_token_json = await requestToken()
+    if access_token_json == None:
+        return False
+    else:
+        try:
+            writeFile(access_token_json)
+            return True
+        except:
+            ACCESS.debug("access_token文件写入失败")
+            return False

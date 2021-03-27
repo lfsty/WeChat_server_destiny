@@ -54,7 +54,8 @@ try:
             wechatid char(30) NOT NULL PRIMARY KEY,
             steamid char(17),
             membershipid char(19),
-            username char(30))"""
+            username char(30),
+            Authority char(10))"""
     cursor.execute(sql)
 
     sql = """CREATE TABLE IF NOT EXISTS daily ( 

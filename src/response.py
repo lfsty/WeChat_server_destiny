@@ -72,7 +72,10 @@ async def sendDataToUser(msgtype, touser, content):
     if resp_data != {}:
         access_token = await src.accessToken.getAccessToken()
         url = f"https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={access_token}"
-        await src.urlRequest.PostResponse(url, resp_data)
+        resp = await src.urlRequest.PostResponse(url, resp_data)
+        resp = json.loads(resp)
+        if resp["errmsg"] != "ok":
+            ACCESS.debug(resp["errmsg"])
 
 
 async def response(xml_data):
@@ -148,6 +151,8 @@ async def TextHandler(wechat_id, content_list):
         # 永久图片
         elif content_list[0] in Options["permanent_image_option"]:
             resp_content, msgtype = await getImages(content_list[0])
+        elif content_list[0] == "强制刷新":
+            resp_content, msgtype = await force_refresh(wechat_id)
         # 其他
         else:
             resp_content, msgtype = await elseData()
@@ -513,4 +518,18 @@ async def bindData(steamid, wechat_id):
                 resp_content = "绑定账号失败"
         else:
             resp_content = "用户不存在或存在重名，请使用SteamID绑定"
+    return resp_content, msgtype
+
+
+async def force_refresh(wechat_id):
+    msgtype = "text"
+    resp_content = "您没有权限"
+    data = await src.database.FindUserDataByWchatID(wechat_id)
+    Authority = data[4]
+    if Authority == "root":
+        resp = await src.accessToken.refresh_access_token()
+        if resp == False:
+            return "刷新access_token失败", msgtype
+
+        resp_content = "OK"
     return resp_content, msgtype
