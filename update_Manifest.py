@@ -54,6 +54,7 @@ def getManifest(lang="zh-chs"):
                 json.dump(temp, f)
             pbar_total.update(1)
         pbar_total.close()
+        return "OK"
     else:
         return None
 

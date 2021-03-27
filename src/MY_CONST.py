@@ -83,5 +83,6 @@ try:
         ActivityDefinition = json.load(f)
 
 except:
-    ACCESS.debug("Manifest文件读取出错,请先运行update_Manifest")
+    ACCESS.debug("Manifest文件读取出错")
+    print("Manifest文件读取出错,请先运行update_Manifest")
     os._exit(0)
