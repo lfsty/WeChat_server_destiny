@@ -6,6 +6,8 @@ ROOT = ""
 proxy = ""
 help = ""
 
+# 定义日志
+
 
 def get_logger(logger_name, log_file, level):
     l = logging.getLogger(logger_name)
@@ -19,6 +21,7 @@ def get_logger(logger_name, log_file, level):
     return logging.getLogger(logger_name)
 
 
+# 获取程序运行的主要信息
 with open("./data/main_data.json", "r") as f:
     data = json.load(f)
     try:
@@ -43,6 +46,7 @@ try:
 except:
     print("log设置出错")
     os._exit(0)
+
 # 读取帮助信息
 try:
     with open("./data/help.txt", "r") as f:
@@ -66,9 +70,11 @@ with open("./data/destiny_data.json", "r") as f:
         ACCESS.debug("destiny_data.json文件读取出错")
         os._exit(0)
 
+# ELO保留的信息
 remain = {"Control": "占领", "Iron Banner": "铁骑",
           "Survival": "生存", "Trials of Osiris": "试炼"}
 
+# 读取Bungie的Manifest文件
 with open("./Manifest/DestinyInventoryItemDefinition.json", "r") as f:
     ItemDefinition = json.load(f)
 

@@ -9,8 +9,13 @@ import urllib3
 
 
 def is_steamid64(input_text):
-    """判断是否为steamid
-    返回：True/False
+    """
+    判断是否为SteamID
+
+    Args:
+        input_text:需要判断的文本
+    Returns:
+        True/False
     """
     if input_text.isdigit() and len(input_text) == 17 and input_text[:4] == '7656':
         return True
@@ -19,8 +24,13 @@ def is_steamid64(input_text):
 
 
 def is_bungie_membershipid(input_text):
-    """判断是否为membershipID
-    返回：True/False
+    """
+    判断是否为MembershipID
+
+    Args:
+        input_text:需要判断的文本
+    Returns:
+        True/False
     """
     if input_text.isdigit() and len(input_text) == 19 and input_text[:4] == '4611':
         return True
@@ -29,9 +39,14 @@ def is_bungie_membershipid(input_text):
 
 
 async def getXurLocation():
-    """获取当时xur位置
-    返回：若存在，则返回位置，若不存在则返回None，
-            位置不在表中是情况返回“位置获取出错”，请及时更新json表
+    """
+    获取当时xur位置
+
+    Args:
+        None
+    Returns:
+        若存在，则返回位置，若不存在则返回None，
+        位置不在表中是情况返回“XUR位置转化出错”，请及时更新json表
     """
     url = "https://xur.wiki"
     try:
@@ -54,6 +69,14 @@ async def getXurLocation():
 
 
 async def getXurSaleItems():
+    """
+    获取XUR所售卖的信息
+
+    Args:
+        None
+    Returns:
+        售卖信息的list
+    """
     url = ROOT + f"/Destiny2/Vendors/?components=402"
     data = await GetResponseByUrl(url, need_header=True)
     data = json.loads(data)["Response"]
@@ -68,6 +91,15 @@ async def getXurSaleItems():
 
 
 async def getCharacterIdsByMembershipId(destinyMembershipId, membershipType="3"):
+    """
+    通过MembershipID获取用户的CharacterID
+
+    Args:
+        destinyMembershipId:命运2的MembershipID
+        membershipType:用户类型，默认为3（steam平台）
+    Returns:
+        characterIDs列表
+    """
     try:
         characterIds = []
         url = ROOT + \
@@ -83,6 +115,14 @@ async def getCharacterIdsByMembershipId(destinyMembershipId, membershipType="3")
 
 
 async def getMembershipIDBySteamID(steamid):
+    """
+    通过SteamID获取用户MembershiID
+
+    Args:
+        Steamid
+    Returns:
+        MembershipID
+    """
     try:
         url = ROOT + \
             f"/User/GetMembershipFromHardLinkedCredential/SteamId/{steamid}/"
@@ -95,6 +135,14 @@ async def getMembershipIDBySteamID(steamid):
 
 
 async def getSteamIDByMembershipID(membershipid):
+    """
+    通过MembershipID获取用户的SteamID
+
+    Args:
+        membershipid
+    Returns:
+        SteamID
+    """
     try:
         url = f"https://www.bungie.net/en/Profile/{membershipid}"
         data = await GetResponseByUrl(url)
@@ -108,18 +156,36 @@ async def getSteamIDByMembershipID(membershipid):
         return None
 
 
-async def getUsernameByMenbershipid(menbershipid):
+async def getUsernameByMembershipid(membershipid):
+    """
+    根据用户的MembershipID获取用户的昵称
+
+    Args:
+        membershipId
+    Returns:
+        UserName
+    """
     try:
-        url = ROOT + f"/User/GetMembershipsById/{menbershipid}/-1/"
+        url = ROOT + f"/User/GetMembershipsById/{membershipid}/-1/"
         resp = await GetResponseByUrl(url, need_header=True)
         resp = json.loads(resp)["Response"]
         return resp['destinyMemberships'][0]['LastSeenDisplayName']
     except:
-        ACCESS.debug("getUsernameByMenbershipid出错")
+        ACCESS.debug("getUsernameByMembershipid出错")
         return None
 
 
 async def getUserRaidReportByCharacterID(characterID, destinyMembershipId, membershipType="3"):
+    """
+    根据characterid获取角色的raid信息
+
+    Args:
+        characterID
+        destinyMembershipId
+        membershipType
+    Returns:
+        list类型结果信息
+    """
     url = ROOT + \
         f"/Destiny2/{membershipType}/Account/{destinyMembershipId}/Character/{characterID}/Stats/Activities/?count=250&mode=raid&page=0"
     try:
@@ -148,6 +214,16 @@ async def getUserRaidReportByCharacterID(characterID, destinyMembershipId, membe
 
 
 async def getUserRaidReportByMemberShipID(destinyMembershipId, UserName, membershipType="3"):
+    """
+    通过MembershipID获取用户的Raid信息
+
+    Args:
+        destinyMembershipId
+        UserName:用户昵称，用于组织返回信息
+        membershipType
+    Returns:
+        组织完的Raid信息
+    """
     try:
         tasks = []
         raid_data = {}
@@ -171,7 +247,17 @@ async def getUserRaidReportByMemberShipID(destinyMembershipId, UserName, members
         return "查询出错，请稍后再试"
 
 
-async def getPlayerdataBySteamID(steamid, UserName, season="13"):
+async def getPlayerdataBySteamID(steamid, UserName, season=current_season):
+    """
+    根据SteamID获取用户ELO信息
+
+    Args:
+        steamid
+        UserName:用户昵称，用于组织返回信息
+        season:赛季信息，默认为当前赛季
+    Returns:
+        组织完的ELO信息
+    """
     url = f"https://api.tracker.gg/api/v2/destiny-2/standard/profile/steam/{steamid}/segments/playlist?season={season}"
     try:
         response = await urllibRequestGet(url)
@@ -206,6 +292,15 @@ async def getPlayerdataBySteamID(steamid, UserName, season="13"):
 
 
 async def getPartyMembersDataByMembershipID(destinyMembershipId, membershipType="3"):
+    """
+    根据MembershipID获取用户火力战队的成员信息
+
+    Args:
+        destinyMembershipId
+        membershipType
+    Returns:
+        用户火力战队的成员的MembershipID的list
+    """
     url = ROOT + \
         f"/Destiny2/{membershipType}/Profile/{destinyMembershipId}/?components=1000"
     resp = await GetResponseByUrl(url, need_header=True)
@@ -226,6 +321,15 @@ async def getPartyMembersDataByMembershipID(destinyMembershipId, membershipType=
 
 
 async def getPartyMembersRaidReport(destinyMembershipId, membershipType="3"):
+    """
+    根据MembershipID获取用户火力战队成员的Raid信息
+
+    Args:
+        destinyMembershipId
+        membershipType
+    Returns:
+        组织完的信息
+    """
     partyMembers = await getPartyMembersDataByMembershipID(destinyMembershipId)
     if partyMembers == None:
         return "玩家不在线"
@@ -244,6 +348,15 @@ async def getPartyMembersRaidReport(destinyMembershipId, membershipType="3"):
 
 
 async def getPartyMembersElo(destinyMembershipId, membershipType="3"):
+    """
+    根据MembershipID获取用户火力战队成员的ELO信息
+
+    Args:
+        MembershipID
+        membershipType
+    Returns:
+        组织完的信息
+    """
     partyMembers = await getPartyMembersDataByMembershipID(destinyMembershipId)
     if partyMembers == None:
         return "玩家不在线"
@@ -262,6 +375,15 @@ async def getPartyMembersElo(destinyMembershipId, membershipType="3"):
 
 
 async def SearchUsersByName(name, membershipType="-1"):
+    """
+    根据用户昵称获取用户的MembershipID，不推荐使用，可能有重名，也可能有BUG，Bungie老传统了
+
+    Args:
+        name:用户昵称
+        membershipType:默认为“-1”，全平台搜索
+    Returns:
+        搜寻到的MembershipID，若不存在或者重名，则返回None
+    """
     url = ROOT + \
         f"/Destiny2/SearchDestinyPlayer/{membershipType}/{name}/"
     try:

@@ -6,6 +6,14 @@ from src.MY_CONST import *
 
 
 async def getManifest(lang="zh-chs"):
+    """
+    下载Manifest
+
+    Args:
+        lang:语言选择，默认为简体中文
+    Returns:
+        None
+    """
     try:
         url = ROOT + "/Destiny2/Manifest/"
         response = await GetResponseByUrl(url, need_header=True)

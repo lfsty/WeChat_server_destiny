@@ -11,10 +11,21 @@ import src.imgHandler
 
 
 def thread_response(xml_data):
+    """
+    消息处理运行总入口
+    """
     asyncio.run(response(xml_data))
 
 
 def get_Season(season_input):
+    """
+    获取赛季信息
+
+    Args: 
+        season_input:用户赛季输入
+    Returns:
+        输入正确则返回对应赛季的字符串格式的数字，输入错误则返回“error”
+    """
     if season_input in season_list:
         season = season_list[season_input]
     else:
@@ -29,6 +40,16 @@ def get_Season(season_input):
 
 
 async def sendDataToUser(msgtype, touser, content):
+    """
+    给用户发送消息，需要有微信平台客服返回消息权限，post方式
+
+    Args:
+        msgtype:消息格式，值为"text"或者"image"
+        touser:接受消息用户，微信OpenID
+        content:消息内容，文字信息或者mediaid
+    Returns:
+        None
+    """
     resp_data = {}
     if msgtype == "text":
         resp_data = {
@@ -55,6 +76,14 @@ async def sendDataToUser(msgtype, touser, content):
 
 
 async def response(xml_data):
+    """
+    对用户信息进行解析和处理
+
+    Args:
+        xml_data:微信发送的源xml数据
+    Returns:
+        None
+    """
     dict_data = xmltodict.parse(xml_data)['xml']  # 进行XML解析
     msg_type = dict_data['MsgType']
     wechat_id = dict_data['FromUserName']
@@ -81,6 +110,16 @@ async def response(xml_data):
 
 
 async def TextHandler(wechat_id, content_list):
+    """
+    用户发送为文字信息，对文字信息进行处理
+
+    Args:
+        wechat_id:微信用户OpenID
+        content_list:用户发送的消息以“ ”（空格）拆分，list类型
+    Returns:
+        resp_content:消息内容
+        msgtype:消息类型
+    """
     ACCESS.info(f"{wechat_id}:{content_list}")
     # 只有一个参数
     if len(content_list) == 1:
@@ -119,10 +158,10 @@ async def TextHandler(wechat_id, content_list):
             resp_content, msgtype = await bindData(steamid=content_list[1], wechat_id=wechat_id)
         # 指令为elo
         elif content_list[0] in Options["elo_option"]:
-            resp_content, msgtype = await getElo(steamid=content_list[1])
+            resp_content, msgtype = await getElo(steamid=content_list[1], wechat_id=wechat_id)
         # 指令为raid
         elif content_list[0] in Options["raid_option"]:
-            resp_content, msgtype = await getRaid(steamid=content_list[1])
+            resp_content, msgtype = await getRaid(steamid=content_list[1], wechat_id=wechat_id)
         # 指令为队友
         elif content_list[0] == "队友":
             if content_list[1] in Options["raid_option"]:
@@ -150,10 +189,28 @@ async def TextHandler(wechat_id, content_list):
 
 
 async def returnWaitingMsg(wechat_id):
+    """
+    给用户发送等待消息
+
+    Args:
+        wechat_id:微信用户OpenID
+    Returns:
+        None
+    """
     await sendDataToUser("text", wechat_id, "获取此信息时间可能较长，请稍后...")
 
 
 async def EventKeyHandler(wechat_id, EventKey):
+    """
+    Event类型消息处理
+
+    Args:
+        wechat_id:微信用户OpenID
+        EventKey:自定义的Event，详情见"./interface.py"
+    Returns:
+        resp_content:消息内容
+        msgtype:消息类型
+    """
     ACCESS.info(f"{wechat_id}:{EventKey}")
     if EventKey == "daily":
         resp_content, msgtype = await getDaily()
@@ -191,7 +248,18 @@ async def EventKeyHandler(wechat_id, EventKey):
 #     return resp_content, msgtype
 
 
-async def getRaid(wechat_id=None, steamid=None, party=False):
+async def getRaid(wechat_id, steamid=None, party=False):
+    """
+    获取Raid信息
+
+    Args:
+        wechat_id:微信用户OpenID，用于给用户返回提示等待信息
+        steamid:SteamID信息，根据SteamID查询用户记录，默认为None
+        party:是否查询火力战队信息，bool类型，默认为False
+    Returns:
+        resp_content:消息内容
+        msgtype:消息类型
+    """
     msgtype = "text"
     await returnWaitingMsg(wechat_id)
     if not party:
@@ -211,7 +279,7 @@ async def getRaid(wechat_id=None, steamid=None, party=False):
             if src.destiny_api.is_steamid64(steamid):
                 SteamID = steamid
                 MembershipID = await src.destiny_api.getMembershipIDBySteamID(SteamID)
-                UserName = await src.destiny_api.getUsernameByMenbershipid(MembershipID)
+                UserName = await src.destiny_api.getUsernameByMembershipid(MembershipID)
                 resp_content = await src.destiny_api.getUserRaidReportByMemberShipID(MembershipID, UserName)
             else:
                 UserName = steamid
@@ -239,7 +307,19 @@ async def getRaid(wechat_id=None, steamid=None, party=False):
     return resp_content, msgtype
 
 
-async def getElo(wechat_id=None, steamid=None, party=False, season="13"):
+async def getElo(wechat_id, steamid=None, party=False, season=current_season):
+    """
+    获取用户ELO信息
+
+    Args:
+        wechat_id:微信用户OpenID，用于给用户返回提示等待信息
+        steamid:SteamID信息，根据SteamID查询用户记录，默认为None
+        party:是否查询火力战队信息，bool类型，默认为False
+        season:确定赛季信息，默认为当前赛季
+    Returns:
+        resp_content:消息内容
+        msgtype:消息类型
+    """
     msgtype = "text"
     if season != "13":
         season = get_Season(season)
@@ -263,7 +343,7 @@ async def getElo(wechat_id=None, steamid=None, party=False, season="13"):
             if src.destiny_api.is_steamid64(steamid):
                 SteamID = steamid
                 MembershipID = await src.destiny_api.getMembershipIDBySteamID(SteamID)
-                UserName = await src.destiny_api.getUsernameByMenbershipid(MembershipID)
+                UserName = await src.destiny_api.getUsernameByMembershipid(MembershipID)
                 resp_content = await src.destiny_api.getPlayerdataBySteamID(SteamID, UserName, season)
             else:
                 UserName = steamid
@@ -291,6 +371,15 @@ async def getElo(wechat_id=None, steamid=None, party=False, season="13"):
 
 
 async def getImages(name):
+    """
+    获取图片信息
+
+    Args:
+        name:地窖开车关/下水道/"破碎王座地图/许愿墙
+    Returns:
+        resp_content:图片的微信素材的MEDIA_ID或者错误信息
+        msgtype:消息类型
+    """
     msgtype = "image"
     name_en = Options["permanent_image_option"][name]
     return_data = await src.database.FindImageByName(name_en, "permanent")
@@ -303,6 +392,15 @@ async def getImages(name):
 
 
 async def getDaily():
+    """
+    获取日报的MEDIA_ID
+
+    Args:
+        None
+    Returns:
+        resp_content:日报图片的微信素材的MEDIA_ID或者错误信息
+        msgtype:消息类型
+    """
     msgtype = "image"
     resp_content = await src.imgHandler.getDaily()
     if resp_content == None:
@@ -312,6 +410,15 @@ async def getDaily():
 
 
 async def getWeekly():
+    """
+    获取周报的MEDIA_ID
+
+    Args:
+        None
+    Returns:
+        resp_content:周报图片的微信素材的MEDIA_ID或者错误信息
+        msgtype:消息类型
+    """
     msgtype = "image"
     resp_content = await src.imgHandler.getWeekly()
     if resp_content == None:
@@ -321,6 +428,15 @@ async def getWeekly():
 
 
 async def getXur():
+    """
+    获取XUR图片的MEDIA_ID
+
+    Args:
+        None
+    Returns:
+        resp_content:XUR图片的微信素材的MEDIA_ID或者错误信息
+        msgtype:消息类型
+    """
     msgtype = "image"
     resp_content = await src.imgHandler.getXurOrOsiris("xur")
     if resp_content == None:
@@ -330,6 +446,15 @@ async def getXur():
 
 
 async def getOsiris():
+    """
+    获取试炼的MEDIA_ID
+
+    Args:
+        None
+    Returns:
+        resp_content:试炼图片的微信素材的MEDIA_ID或者错误信息
+        msgtype:消息类型
+    """
     msgtype = "image"
     resp_content = await src.imgHandler.getXurOrOsiris("Osiris")
     if resp_content == None:
@@ -339,19 +464,38 @@ async def getOsiris():
 
 
 async def elseData():
+    """
+    获取帮助信息
+
+    Args:
+        None
+    Returns:
+        resp_content:help信息
+        msgtype:"text"
+    """
     msgtype = "text"
     resp_content = help
     return resp_content, msgtype
 
 
 async def bindData(steamid, wechat_id):
+    """
+    绑定账号
+
+    Args:
+        steamid:需要绑定SteamID
+        wechat_id:需要绑定的微信OpenID
+    Returns:
+        resp_content:提示信息
+        msgtype:"text"
+    """
     msgtype = "text"
     if src.destiny_api.is_steamid64(steamid):
         SteamID = steamid
         MembershipID = await src.destiny_api.getMembershipIDBySteamID(SteamID)
         if MembershipID == None:
             return "MembershipID查询出错", msgtype
-        UserName = await src.destiny_api.getUsernameByMenbershipid(MembershipID)
+        UserName = await src.destiny_api.getUsernameByMembershipid(MembershipID)
         if UserName == None:
             return "UserName查询出错", msgtype
         if await src.database.save_data(wechat_id, SteamID, MembershipID, UserName):

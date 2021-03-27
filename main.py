@@ -14,6 +14,7 @@ TOKEN = ""
 
 
 def check_signature(signature, timestamp, nonce):
+    # 微信公众平台服务器认证
     global TOKEN
     mylist = [TOKEN, timestamp, nonce]
     mylist.sort()

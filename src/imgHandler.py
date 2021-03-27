@@ -11,6 +11,14 @@ import requests
 
 
 async def getDaily():
+    """
+    获取日报的MEDIA_ID
+
+    Args:
+        None
+    Returns:
+        日报的MEDIA_ID或者错误返回None
+    """
     choose = "daily"
     name = datetime.datetime.now().strftime("%Y-%m-%d")
     files = os.listdir("./images/daily/")
@@ -32,6 +40,14 @@ async def getDaily():
 
 
 async def getWeekly():
+    """
+    获取周报的MEDIA_ID
+
+    Args:
+        None
+    Returns:
+        周报的MEDIA_ID或者错误返回None
+    """
     choose = "weekly"
     today = datetime.datetime.now().weekday()
     if today >= 2:
@@ -69,6 +85,14 @@ async def getWeekly():
 
 
 async def getXurOrOsiris(select):
+    """
+    获取XUR或Osiris的MEDIA_ID
+
+    Args:
+        select:"xur"或"Osiris"，选择所需要的图片
+    Returns:
+        XUR或Osiris的MEDIA_ID或者错误返回None
+    """
     if select not in ["xur", "Osiris"]:
         ACCESS.debug("getXurOrOsiris,选择出错")
         return None
@@ -116,6 +140,16 @@ async def getXurOrOsiris(select):
 
 
 async def bindAction(full_path, choose, name):
+    """
+    上传图片至微信素材库与存储MEDIA_ID至MySQL数据库
+
+    Args:
+        full_path:完整的图片路径
+        choose:选择图片类型
+        name:图片名称
+    Returns:
+        日报的MEDIA_ID或者错误返回False
+    """
     if choose not in choose_list:
         ACCESS.debug("bindAction,选择出错")
         return False
@@ -128,6 +162,14 @@ async def bindAction(full_path, choose, name):
 
 
 async def uploadImageToWeChat(filepath):
+    """
+    上传图片至微信素材库，临时素材，有效期3天
+
+    Args:
+        filepath:完整的图片路径
+    Returns:
+        resp:post信息返回结果
+    """
     access_token = await src.accessToken.getAccessToken()
     img_upload_url = f"https://api.weixin.qq.com/cgi-bin/media/upload?access_token={access_token}&type=image"
     with open(filepath, "rb") as f:
@@ -137,6 +179,14 @@ async def uploadImageToWeChat(filepath):
 
 
 async def downloadDaily():
+    """
+    下载日报，感谢@天阙
+
+    Args:
+        None
+    Returns:
+        None
+    """
     url = "http://www.tianque.top/d2api/today/"
     resp = await src.urlRequest.GetResponseByUrl(url)
     data = json.loads(resp)
@@ -148,6 +198,16 @@ async def downloadDaily():
 
 
 async def downloadImage(name, full_path, current_time_name=None):
+    """
+    下载日报，感谢@seanalpha
+
+    Args:
+        name:下载图片的名称，参数为："命运2周报"或者"苏尔情报"或者"试炼周报"
+        full_path:保存图片的完整路径
+        current_time_name:当前时间，用于判断图片是否已更新
+    Returns:
+        None
+    """
     url = "https://api.xiaoheihe.cn/wiki/get_homepage_content/?wiki_id=1085660&verison=&is_share=1"
     resp = await src.urlRequest.GetResponseByUrl(url)
     data = json.loads(resp)
@@ -171,6 +231,14 @@ async def downloadImage(name, full_path, current_time_name=None):
 
 
 async def uploadPermanentImageToWeChat(filepath):
+    """
+    上传永久图片素材至微信素材库
+
+    Args:
+        full_path:图片的完整路径
+    Returns:
+        resp:post信息返回结果
+    """
     access_token = await src.accessToken.getAccessToken()
     img_upload_url = f"https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={access_token}&type=image"
     with open(filepath, "rb") as f:
@@ -180,6 +248,14 @@ async def uploadPermanentImageToWeChat(filepath):
 
 
 async def updataPermanentImages():
+    """
+    更新"../images/permanent"目录下的图片素材，上传至微信素材库并保存相关信息至MySQL
+
+    Args:
+        None
+    Returns:
+        None
+    """
     path = "./images/permanent/"
     files = os.listdir(path)
     saved_data = []

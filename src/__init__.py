@@ -3,6 +3,8 @@ import asyncio
 import pymysql
 import json
 
+
+# 程序运行的初始化操作
 if not os.path.exists("./data/main_data.json"):
     print("main_data.json文件不存在...")
     os._exit(0)

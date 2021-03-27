@@ -4,6 +4,14 @@ import aiomysql
 
 
 async def conn_db():
+    """
+    连接MySQL数据库
+
+    Args:
+        None
+    Returns:
+        connect
+    """
     try:
         conn = await aiomysql.connect(host=db_host, port=db_port,
                                       user=db_username, password=db_passwd,
@@ -15,7 +23,17 @@ async def conn_db():
 
 
 async def save_data(wechatid, steamid, membershipid, username):
+    """
+    保存用户绑定数据
 
+    Args:
+        wechatid:微信用户OpenID
+        steamid:
+        membershipId:
+        username:用户昵称
+    Returns:
+        True/False
+    """
     conn = await conn_db()
     if conn == None:
         return False
@@ -44,6 +62,17 @@ async def save_data(wechatid, steamid, membershipid, username):
 
 
 async def save_data_image(name, media_id, created_time, choose):
+    """
+    保存临时图片信息
+
+    Args:
+        name:图片名称
+        media_id:图片素材的MEDIA_ID
+        created_time:创建的时间，以便判断是否在有效期
+        choose:保存的数据类型，详情见"./MY_CONST.py" "choose_list" 项
+    Returns:
+        True/False
+    """
     if choose not in choose_list:
         ACCESS.debug("save_data_image,选择出错")
         return False
@@ -75,7 +104,14 @@ async def save_data_image(name, media_id, created_time, choose):
 
 
 async def FindUserDataByWchatID(wechatid):
+    """
+    查询用户绑定信息
 
+    Args:
+        wechatid:微信用户OpenID
+    Returns:
+        返回查询到的信息
+    """
     conn = await conn_db()
     if conn == None:
         return False
@@ -96,6 +132,15 @@ async def FindUserDataByWchatID(wechatid):
 
 
 async def FindImageByName(name, choose):
+    """
+    查询图片信息
+
+    Args:
+        name:图片名称
+        choose:保存的数据类型，详情见"./MY_CONST.py" "choose_list" 项
+    Returns:
+        返回查询到的信息
+    """
     if choose not in choose_list:
         ACCESS.debug("FindImageByName,选择出错")
         return False
@@ -119,7 +164,15 @@ async def FindImageByName(name, choose):
 
 
 async def save_permanent_data(name, media_id):
+    """
+    保存永久图片信息
 
+    Args:
+        name:图片名称
+        media_id:图片素材的MEDIA_ID
+    Returns:
+        True/False
+    """
     conn = await conn_db()
     if conn == None:
         return False
@@ -148,7 +201,14 @@ async def save_permanent_data(name, media_id):
 
 
 async def FindSavedPermanent_all():
+    """
+    查询所有保存的永久图片信息
 
+    Args:
+        None
+    Returns:
+        查询到的信息
+    """
     conn = await conn_db()
     if conn == None:
         return None

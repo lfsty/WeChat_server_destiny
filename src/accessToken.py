@@ -7,6 +7,14 @@ import time
 
 
 async def requestToken():
+    """
+    获取微信公众平台的access_token
+
+    Args:
+        None
+    Returns:
+        获取到的信息或者出错返回None
+    """
     try:
         url = f"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={wechat_appID}&secret={appsecret}"
         resp = await GetResponseByUrl(url)
@@ -17,6 +25,14 @@ async def requestToken():
 
 
 def writeFile(access_token_json):
+    """
+    将获取到的access_token_json信息写入文件，以便后续调用
+
+    Args:
+        access_token_json:获取到的access_token信息
+    Returns:
+        None
+    """
     with open("./data/access_token.json", "w") as f:
         now_time = time.time()
         data = {"access_token": access_token_json["access_token"],
@@ -25,6 +41,14 @@ def writeFile(access_token_json):
 
 
 async def getAccessToken():
+    """
+    调用总入口，返回一个有效的access_token
+
+    Args:
+        None
+    Returns:
+        access_token
+    """
     # 是否更新文件
     flag = False
     with open("./data/access_token.json", "r+") as f:
