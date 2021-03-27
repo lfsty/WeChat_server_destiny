@@ -113,9 +113,3 @@ if not os.path.exists("./images/xur"):
 
 if not os.path.exists("./log"):
     os.makedirs("./log")
-
-if not os.path.exists("./Manifest"):
-    import src.DownloadManifest
-    print("Manifest文件不存在，下载Manifest")
-    if asyncio.run(src.DownloadManifest.getManifest()) == None:
-        os._exit(0)

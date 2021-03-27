@@ -8,6 +8,14 @@ from collections import Counter
 import urllib3
 
 
+# 读取Bungie的Manifest文件
+with open("./Manifest/DestinyInventoryItemDefinition.json", "r") as f:
+    ItemDefinition = json.load(f)
+
+with open("./Manifest/DestinyActivityDefinition.json", "r") as f:
+    ActivityDefinition = json.load(f)
+
+
 def is_steamid64(input_text):
     """
     判断是否为SteamID

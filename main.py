@@ -10,6 +10,7 @@ import threading
 import src.interface
 import atexit
 from src.MY_CONST import *
+import update_Manifest
 TOKEN = ""
 
 
@@ -65,6 +66,11 @@ def exit_fun():
 
 
 if __name__ == "__main__":
+
+    if not os.path.exists("./Manifest"):
+        if update_Manifest.getManifest() == None:
+            print("下载Manifest失败")
+            os._exit(0)
 
     port, path = LoadServerData()
     application = tornado.web.Application([
