@@ -1,3 +1,3 @@
 #!/bin/bash
 
-screen -S "wechat" python3 main.py
+screen -S "WeChat_Server" python3 main.py
