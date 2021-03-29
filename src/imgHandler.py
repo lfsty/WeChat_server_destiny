@@ -53,7 +53,7 @@ async def getWeekly():
     if today >= 2:
         gap = today - 2
     else:
-        gap = today + 4
+        gap = today + 5
     name = (datetime.datetime.now()-datetime.timedelta(days=gap)
             ).strftime("%Y-%m-%d")
     files = os.listdir("./images/weekly/")
@@ -74,7 +74,7 @@ async def getWeekly():
                 return await bindAction(full_path, choose, name)
         else:
             try:
-                await downloadImage("命运2周报", full_path)
+                await downloadImage("命运2周报", full_path, name)
             except:
                 ACCESS.debug("下载周报失败")
                 return None
